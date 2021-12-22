@@ -39,6 +39,14 @@
   when:
     - detected_distribution | default("") == "Raspbian"
 
+- name: Set detected_distribution to ArchLinux (ARM64)
+  set_fact:
+    detected_distribution: Archlinux
+  when:
+    - ansible_facts.architecture is search("aarch64")
+    - raspberry_pi|default(false)
+    - ansible_facts.os_family is match("Archlinux")
+
 - name: execute OS related tasks on the Raspberry Pi
   include_tasks: "{{ item }}"
   with_first_found:
