@@ -50,6 +50,7 @@
 
       when: k3s_version == 'undefined'
       run_once: true
+      check_mode: no
 
     - name: Output version
       debug:

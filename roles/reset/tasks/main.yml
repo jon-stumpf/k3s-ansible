@@ -74,7 +74,7 @@
 
 - name: Remove CNI interfaces
   command: ip link delete {{ item }}
-  loop: "{{ ip_link_show.stdout | from_json | json_query('[*].ifname') }}"
+  loop: "{{ (ip_link_show.stdout if ip_link_show.stdout != '' else  '[ ]') | from_json | json_query('[*].name') }}"
 
 #
 # Remove other interfaces and files
