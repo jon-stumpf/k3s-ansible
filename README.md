@@ -30,7 +30,7 @@ Here is what has been tested (:heavy_check_mark:) with *k3s-ansible*.
 | Ubuntu           | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | CentOS           | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | RedHat           | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| ArchLinux        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| ArchLinux        | implemented | implemented | implemented |
 
 ## System requirements
 
