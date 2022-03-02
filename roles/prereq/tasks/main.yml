@@ -52,3 +52,9 @@
     path: /etc/sudoers
     validate: 'visudo -cf %s'
   when: ansible_distribution in ['CentOS', 'RedHat', 'Red Hat Enterprise Linux']
+
+- name: Install additional packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ install_additional_packages | default([]) }}"

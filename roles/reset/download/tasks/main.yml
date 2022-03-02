@@ -26,6 +26,12 @@
     - ansible_pkg_mgr == "zypper"
     - remove_packages | bool
 
+- name: Remove additional packages
+  package:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ install_additional_packages | default([]) }}"
+
 - name: Remove yum repo files
   shell: 'rm -f /etc/yum.repos.d/rancher-k3s-common*.repo'
   register: remove_repo_files
