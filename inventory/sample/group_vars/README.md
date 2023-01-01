@@ -106,3 +106,15 @@ Lastly, some install flags did not make sense to implement with *k3s-ansible*:
 | **INSTALL_K3S_SKIP_ENABLE**   | *k3s-ansible* always enables the service. |
 | **INSTALL_K3S_SKIP_START**    | *k3s-ansible* always starts the service. |
 
+### Install additional packages
+
+List out additional packages to install on to servers and agents.
+
+- **install_additional_packages**: the default is `''`.
+
+Example:
+```
+# Install longhorn required packages
+install_additional_packages:
+  - nfs-common
+```

@@ -52,3 +52,14 @@
     path: /etc/sudoers
     validate: 'visudo -cf %s'
   when: ansible_distribution in ['CentOS', 'RedHat', 'Red Hat Enterprise Linux']
+
+- name: Wait for automatic system updates
+  shell: while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 10; done;
+  when: ansible_distribution in ['Ubuntu']
+
+- name: Install additional packages
+  package:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items: "{{ install_additional_packages | default([]) }}"
