@@ -33,18 +33,41 @@
 # node-token tasks
 #
 
-- name: Wait for node-token
-  wait_for:
-    path: "{{ data_dir }}/server/node-token"
+- name: node-token tasks
+  block:
+    - name: Wait for node-token
+      wait_for:
+        path: "{{ data_dir }}/server/node-token"
 
-- name: Read node-token from the server
-  slurp:
-    path: "{{ data_dir }}/server/node-token"
-  register: node_token
+    - name: Register node-token file access mode
+      stat:
+        path: "{{ data_dir }}/server/node-token"
+      register: p
 
-- name: Store the server node-token
+    - name: Make node-token world-readable
+      file:
+        path: "{{ data_dir }}/server/node-token"
+        mode: 0644
+
+    - name: Read node-token from the server
+      slurp:
+        path: "{{ data_dir }}/server/node-token"
+      register: node_token
+
+    - name: Store the server node-token
+      set_fact:
+        token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+
+    - name: Restore node-token file access
+      file:
+        path: "{{ data_dir }}/server/node-token"
+        mode: "{{ p.stat.mode }}"
+  when: not ansible_check_mode
+
+- name: Set token
   set_fact:
-    token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
+    token: "ansible_check_mode token"
+  when: ansible_check_mode
 
 ################################################################################
 # Create ctl commands
@@ -61,6 +84,7 @@
   when:
     - data_dir is defined
     - data_dir != '/var/lib/rancher/k3s'
+    - not ansible_check_mode
 
 - name: Determine k3s bin target
   set_fact:
@@ -75,42 +99,53 @@
     - kubectl
     - crictl
     - ctr
+  when: not ansible_check_mode
 
 ################################################################################
 # Setup {{ ansible_user }}/.kube/config
 #
 
-- name: Create local kube directory, {{ path }}
-  vars:
-    path: "~{{ ansible_user }}/.kube"
-  file:
-    path: "{{ path }}"
-    state: directory
-    owner: "{{ ansible_user }}"
-    mode: "u=rwx,g=rx,o="
+- name: Setup {{ ansible_user }}/.kube/config
+  block:
+    - name: Create local kube directory, {{ path }}
+      vars:
+        path: "~{{ ansible_user }}/.kube"
+      file:
+        path: "{{ path }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        mode: "u=rwx,g=rx,o="
 
-- name: Copy kubeconfig file, {{ src }}, to {{ dest }}
-  vars:
-    src: "/etc/rancher/k3s/k3s.yaml"
-    dest: "~{{ ansible_user }}/.kube/config"
-  copy:
-    src: "{{ src }}"
-    dest: "{{ dest }}"
-    remote_src: yes
-    owner: "{{ ansible_user }}"
-    mode: "u=rw,g=,o="
+    - name: Copy kubeconfig file, {{ src }}, to {{ dest }}
+      vars:
+        src: "/etc/rancher/k3s/k3s.yaml"
+        dest: "~{{ ansible_user }}/.kube/config"
+      copy:
+        src: "{{ src }}"
+        dest: "{{ dest }}"
+        remote_src: yes
+        owner: "{{ ansible_user }}"
+        mode: "u=rw,g=,o="
 
-# Fetch a copy of the cluster config for use in one's ~/.kube/config.
-# The playbook will update the IP address using the cluster-config role.
-- name: Fetch {{ src }} for use in one's ~/.kube/config
-  vars:
-    src: "/etc/rancher/k3s/k3s.yaml"
-  fetch:
-    src: "{{ src }}"
-    dest: "{{ k3s_cluster_config }}.tmp"
-    flat: yes
-  run_once: true
-  changed_when: false
+    - name: Replace https://localhost:6443 by https://server_ip:6443
+      command: >-
+        {{ bin_dir }}/kubectl config set-cluster default
+          --server=https://{{ server_ip }}:6443
+          --kubeconfig ~{{ ansible_user }}/.kube/config
+      changed_when: true
+
+    # Fetch a copy of the cluster config for use in one's ~/.kube/config.
+    # The playbook will update the IP address using the cluster-config role.
+    - name: Fetch {{ src }} for use in one's ~/.kube/config
+      vars:
+        src: "/etc/rancher/k3s/k3s.yaml"
+      fetch:
+        src: "{{ src }}"
+        dest: "{{ k3s_cluster_config }}.tmp"
+        flat: yes
+      run_once: true
+      changed_when: false
+  when: not ansible_check_mode
 
 ##########################
 # Set up HA cluster method
@@ -123,4 +158,3 @@
   when:
     - ha_enabled
     - k3s_cluster_method != 'external'
-
