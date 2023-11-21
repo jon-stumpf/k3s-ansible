@@ -5,7 +5,7 @@
 server_init_args: >-
   {% if ansible_host == first_server %}
     --cluster-init
-    --tls-san {{ apiserver_endpoint }}
+    --tls-san {{ api_endpoint }}
   {% else %}
     --server https://{{ first_server }}:6443
   {% endif %}
