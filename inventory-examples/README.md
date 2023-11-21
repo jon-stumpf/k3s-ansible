@@ -1,20 +1,26 @@
 
 # Introduction
 
-`inventory/x/group_vars/all.yml` is meant to be modified appropriately for your environment.
+`inventory.yml` is meant to be modified appropriately for your environment.
 
-*ansible* variables that were previously here have moved to `playbook/group_vars/all.yml`.
+Mandatory *ansible* variables that were previously here have moved to `playbook/group_vars/all.yml`.
 Those variables are used within the playbooks and roles are not meant to be changed by a user of *k3s-ansible*.
-When adding a new _install_ variable, a corresponding variable is added to `playbook/group_vars/all.yml`
-which is then used throughout *k3s-ansible*.
+When adding a new _install_ variable (see *Install Variables* below), a corresponding variable is added to
+`playbook/group_vars/all.yml` which is then used throughout *k3s-ansible*.
 
 ## General Variables
+
+- **ansible_port**: specifies the port that is used for *ssh* to configure your hosts.
+The default is `22`.
 
 - **ansible_user**: specifies the username that has *ssh* password-less access to configure your hosts.
 The default is `debian`.
 
 - **cluster_config**: specifies the location of where to capture the kube configuration file for the new cluster.
 The default is `playbook/cluster.conf`.
+
+- **k3s_port**: specifies the port used for the k3s cluster service.
+The default is `6443`.
 
 ## High-Availability (HA) Variables
 

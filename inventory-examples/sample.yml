@@ -1,0 +1,29 @@
+---
+k3s_server:
+  hosts:
+    192.168.1.26:
+
+k3s_agent:
+  hosts:
+    192.168.1.34:
+    192.168.1.39:
+    192.168.1.16:
+    192.168.1.32:
+
+k3s_cluster:
+  children:
+    k3s_server:
+    k3s_agent:
+
+  # See inventory/README.md for more options.
+  # If there are no vars, default values will be used for all mandatory fields.
+  vars:
+    ansible_user: debian  # The user that has password-less ssh access to configure your hosts
+
+    # The location of where to capture the kube config of the new cluster
+    # Relative paths are relative to the playbook directory.
+    cluster_config: cluster.conf
+
+    # Use the latest k3s version instead of 'stable'
+    install_k3s_channel: 'latest'
+
