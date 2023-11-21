@@ -19,7 +19,7 @@ The default is `debian`.
 - **cluster_config**: specifies the location of where to capture the kube configuration file for the new cluster.
 The default is `playbook/cluster.conf`.
 
-- **k3s_port**: specifies the port used for the k3s cluster service.
+- **cluster_port**: specifies the port used for the k3s cluster service.
 The default is `6443`.
 
 ## High-Availability (HA) Variables
