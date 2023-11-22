@@ -11,5 +11,5 @@
   shell: ./mkscr
   args:
     chdir: /boot
-  notify: reboot
+  notify: Reboot Pi
   when: cgroup_support.changed
