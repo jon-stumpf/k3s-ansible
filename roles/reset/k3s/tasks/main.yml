@@ -24,7 +24,7 @@
 # /usr/local/bin/k3s-killall.sh
 #
 - name: Shutdown k3s
-  include_tasks: k3s-killall.yml
+  ansible.builtin.include_tasks: k3s-killall.yml
 
 #
 # systemctl disable k3s
@@ -32,7 +32,7 @@
 # systemctl daemon-reload
 #
 - name: Disable services
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: stopped
     enabled: no
@@ -40,7 +40,7 @@
   loop: "{{ k3s_services }}"
 
 - name: daemon_reload
-  systemd:
+  ansible.builtin.systemd:
     daemon_reload: yes
 
 #

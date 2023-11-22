@@ -59,7 +59,7 @@
 - name: Create keepalived configuration, {{ path }}
   vars:
     path: "{{ keepalived_etc_dir }}/{{ keepalived_config_file }}"
-  template:
+  ansible.builtin.template:
     src: "keepalived.conf.j2"
     dest: "{{ path }}"
     owner: root
@@ -70,7 +70,7 @@
 - name: Create keepalived k3s check script, {{ path }}
   vars:
     path: "{{ keepalived_lib_dir }}/{{ keepalived_script_name }}"
-  template:
+  ansible.builtin.template:
     src: "keepalived_check_k3s.sh.j2"
     dest: "{{ path }}"
     owner: "{{ keepalived_script_user }}"
@@ -111,14 +111,14 @@
 # Ensure non-local binding is enabled
 
 - name: Ensure ipv4 nonlocal binding is enabled
-  sysctl:
+  ansible.builtin.sysctl:
     name: net.ipv4.ip_nonlocal_bind
     value: "1"
     state: present
     reload: yes
 
 - name: Ensure ipv6 nonlocal binding is enabled
-  sysctl:
+  ansible.builtin.sysctl:
     name: net.ipv6.ip_nonlocal_bind
     value: "1"
     state: present

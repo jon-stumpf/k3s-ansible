@@ -1,20 +1,20 @@
 ---
 
 - name: Clean previous runs of k3s-init
-  systemd:
+  ansible.builtin.systemd:
     name: k3s-init
     state: stopped
   failed_when: false
 
 - name: Clean previous runs of k3s-init
-  command: systemctl reset-failed k3s-init
+  ansible.builtin.command: systemctl reset-failed k3s-init
   failed_when: false
   changed_when: false
   args:
     warn: false  # The ansible systemd module does not support reset-failed
 
 - name: Init cluster inside the transient k3s-init service
-  command:
+  ansible.builtin.command:
     cmd: "systemd-run -p RestartSec=2 \
                       -p Restart=on-failure \
                       --unit=k3s-init \
@@ -26,7 +26,7 @@
 - name: Verification
   block:
     - name: Verify that all nodes actually joined (check k3s-init.service if this fails)
-      command:
+      ansible.builtin.command:
         cmd: "{{ bin_dir }}/k3s kubectl get nodes -l 'node-role.kubernetes.io/master=true' -o=jsonpath='{.items[*].metadata.name}'"
       when: not ansible_check_mode
       run_once: true
@@ -37,7 +37,7 @@
       changed_when: false
   always:
     - name: Kill the temporary service used for initialization
-      systemd:
+      ansible.builtin.systemd:
         name: k3s-init
         state: stopped
       failed_when: false

@@ -9,7 +9,7 @@
 # See "Clean Environment".
 
 - name: Reset local interface
-  command: "{{ item }}"
+  ansible.builtin.command: "{{ item }}"
   with_items:
     - ip addr flush dev lo
     - ip addr add 127.0.0.1/8 dev lo
@@ -33,7 +33,7 @@
 
 # TODO: Should we download this instead? (See Step 2, https://kube-vip.chipzoller.dev/docs/usage/k3s/)
 - name: Copy RBAC manifest
-  template:
+  ansible.builtin.template:
     src: "kube-vip-rbac.yaml.j2"
     dest: "{{ manifest_dir.path }}/kube-vip-rbac.yaml"
     owner: root
@@ -41,7 +41,7 @@
     mode: "u=rw,g=,o="
 
 - name: Copy arp daemonset manifest
-  template:
+  ansible.builtin.template:
     src: "kube-vip-arp-ds.yaml.j2"
     dest: "{{ manifest_dir.path }}/kube-vip-arp-ds.yaml"
     owner: root
@@ -49,6 +49,6 @@
     mode: "u=rw,g=,o="
 
 - name: Apply kube-vip manifests
-  command: "{{ bin_dir }}/k3s kubectl apply -f {{ manifest_dir.path }}"
+  ansible.builtin.command: "{{ bin_dir }}/k3s kubectl apply -f {{ manifest_dir.path }}"
   run_once: true
 

@@ -15,7 +15,7 @@
 
 - name: Copy K3s service file
   register: k3s_service
-  template:
+  ansible.builtin.template:
     src: "k3s.service.j2"
     dest: "{{ systemd_dir }}/k3s.service"
     owner: root
@@ -23,7 +23,7 @@
     mode: "u=rw,g=r,o=r"
 
 - name: Enable and check K3s service
-  systemd:
+  ansible.builtin.systemd:
     name: k3s
     daemon_reload: "{{ 'yes' if k3s_service.changed else 'no' }}"
     state:  "{{ 'restarted' if k3s_service.changed else 'started' }}"
@@ -55,7 +55,7 @@
       register: node_token
 
     - name: Store the server node-token
-      set_fact:
+      ansible.builtin.set_fact:
         token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
 
     - name: Restore node-token file access
@@ -65,7 +65,7 @@
   when: not ansible_check_mode
 
 - name: Set token
-  set_fact:
+  ansible.builtin.set_fact:
     token: "ansible_check_mode token"
   when: ansible_check_mode
 
@@ -75,7 +75,7 @@
 
 - name: Copy k3s.sh for symlink'd commands
   register: k3s_symlink
-  template:
+  ansible.builtin.template:
     src: "k3s.sh.j2"
     dest: "{{ bin_dir }}/k3s.sh"
     owner: root
@@ -87,7 +87,7 @@
     - not ansible_check_mode
 
 - name: Determine k3s bin target
-  set_fact:
+  ansible.builtin.set_fact:
     k3s_bin_target: "{{ '{{ bin_dir }}/k3s.sh' if data_dir != '/var/lib/rancher/k3s' else '{{ bin_dir }}/k3s' | default('{{ bin_dir }}/k3s') }}"
 
 - name: Create symlink'd commands (kubectl, crictl, ctr)
@@ -128,7 +128,7 @@
         mode: "u=rw,g=,o="
 
     - name: Replace https://localhost:{{ api_port }} by https://api_endpoint:{{ api_port }}
-      command: >-
+      ansible.builtin.command: >-
         {{ bin_dir }}/kubectl config set-cluster default
           --server=https://{{ api_endpoint }}:{{ api_port }}
           --kubeconfig ~{{ ansible_user }}/.kube/config

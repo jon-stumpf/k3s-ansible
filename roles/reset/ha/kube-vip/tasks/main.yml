@@ -35,7 +35,7 @@
 # kube-vip does not do this for you
 
 - name: Remove {{ ha_cluster_vip }}/{{ kube_vip_cidr }} from {{ kube_vip_interface }}
-  command: "ip address delete {{ ha_cluster_vip }}/{{ kube_vip_cidr }} dev {{ kube_vip_interface }}"
+  ansible.builtin.command: "ip address delete {{ ha_cluster_vip }}/{{ kube_vip_cidr }} dev {{ kube_vip_interface }}"
   register: ipaddr_delete
   when: ha_cluster_vip in (ansible_all_ipv4_addresses | list)
 
@@ -44,7 +44,7 @@
 # See "Clean Environment".
 
 - name: Reset local interface
-  command: "{{ item }}"
+  ansible.builtin.command: "{{ item }}"
   with_items:
     - ip addr flush dev lo
     - ip addr add 127.0.0.1/8 dev lo

@@ -12,7 +12,7 @@
 # done
 #
 - name: Disable services
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: stopped
     enabled: no
@@ -24,7 +24,7 @@
 #
 - name: pkill -9 -f "{{ data_dir }}/data/[^/]+/bin/containerd-shim"
   register: pkill_containerd_shim
-  command: pkill -9 -f "{{ data_dir }}/data/[^/]+/bin/containerd-shim"
+  ansible.builtin.command: pkill -9 -f "{{ data_dir }}/data/[^/]+/bin/containerd-shim"
   changed_when: "pkill_containerd_shim.rc == 0"
   failed_when: false
 
@@ -33,7 +33,7 @@
 # do_unmount_and_remove [the list]
 #
 - name: Umount k3s filesystems and remove mount points
-  include_tasks: umount_with_children.yml
+  ansible.builtin.include_tasks: umount_with_children.yml
   loop:
     - /run/k3s
     - "{{ data_dir }}"
@@ -49,7 +49,7 @@
 #
 - name: Show CNI namespaces
   register: ip_netns_show
-  command: ip -j netns show master cni0
+  ansible.builtin.command: ip -j netns show master cni0
   changed_when: false
 
 #
@@ -57,7 +57,7 @@
 # "ip -j netns show master cni0" does not always report "[ ]" but returns 0 when there is no master.
 #
 - name: Remove CNI namespaces
-  command: ip netns delete {{ item }}
+  ansible.builtin.command: ip netns delete {{ item }}
   loop: "{{ (ip_netns_show.stdout if ip_netns_show.stdout != '' else  '[ ]') | from_json | json_query('[*].name') }}"
 
 #
@@ -74,14 +74,14 @@
   changed_when: false
 
 - name: Remove CNI interfaces
-  command: ip link delete {{ item }}
+  ansible.builtin.command: ip link delete {{ item }}
   loop: "{{ ip_link_show.stdout | from_json | json_query('[*].ifname') }}"
 
 #
 # Remove other interfaces and files
 #
 - name: Remove other interfaces
-  command: ip link delete {{ item }}
+  ansible.builtin.command: ip link delete {{ item }}
   when: item in ansible_interfaces
   loop:
     - cni0
@@ -100,13 +100,13 @@
 
 - name: Dump iptables
   register: iptables_saved
-  command: "iptables-save"
+  ansible.builtin.command: "iptables-save"
   changed_when: false
 
 - name: Filter entries using regex pattern "{{ pattern }}"
   vars:
     pattern: '(KUBE|CNI)-'
-  set_fact:
+  ansible.builtin.set_fact:
     iptables_filtered: >-
       {{
         iptables_saved.stdout
@@ -114,7 +114,7 @@
       }}
 
 - name: Remove "(KUBE|CNI)-" iptables entries
-  command:
+  ansible.builtin.command:
     cmd: "iptables-restore"
     stdin: "{{ iptables_filtered }}"
   when: iptables_saved.stdout != iptables_filtered

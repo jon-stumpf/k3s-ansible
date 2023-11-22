@@ -2,7 +2,7 @@
 
 - name: Copy K3s service file
   register: k3s_agent_service
-  template:
+  ansible.builtin.template:
     src: "k3s.service.j2"
     dest: "{{ systemd_dir }}/k3s-agent.service"
     owner: root
@@ -10,7 +10,7 @@
     mode: "u=rw,g=r,o=r"
 
 - name: Enable and check K3s service
-  systemd:
+  ansible.builtin.systemd:
     name: k3s-agent
     daemon_reload: "{{ 'yes' if k3s_agent_service.changed else 'no' }}"
     state:  "{{ 'restarted' if k3s_agent_service.changed else 'started' }}"
