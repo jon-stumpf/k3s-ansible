@@ -4,7 +4,7 @@
     msg: "Single server configuration requires exactly one (1) server."
   when:
     - not ha_enabled
-    - groups['k3s_server'] | length != 1
+    - groups['server'] | length != 1
 
 # Purposefully do the HA check in two steps
 - name: Check for correct HA configuration (minimum)
@@ -12,14 +12,14 @@
     msg: "HA configuration requires an odd number of servers > 1 (i.e., minimum is three)."
   when:
     - ha_enabled
-    - groups['k3s_server'] | length < 3
+    - groups['server'] | length < 3
 
 - name: Check for correct HA configuration (odd number)
   fail:
     msg: "HA configuration requires an ODD number of servers."
   when:
     - ha_enabled
-    - groups['k3s_server'] | length is divisibleby 2
+    - groups['server'] | length is divisibleby 2
 
 - name: Check for a proper HA cluster virtual IP
   fail:

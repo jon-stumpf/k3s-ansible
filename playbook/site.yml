@@ -12,7 +12,7 @@
     - role: raspberrypi
 
 - name: Install the k3s servers
-  hosts: k3s_server
+  hosts: server
   gather_facts: no
   become: yes
   roles:
@@ -26,7 +26,7 @@
     - role: cluster-config
 
 - name: Install the k3s agents
-  hosts: k3s_agent
+  hosts: agent
   gather_facts: no
   become: yes
   roles:

@@ -85,8 +85,8 @@ The install script from [https://get.k3s.io/](https://get.k3s.io/) has one flag 
 provide extra arguments to the *k3s* executable.  *k3s-ansible* uses two variables:
 one for servers and one for agents.  These are:
 
-- **install_k3s_server_args**: the default is `''`.
-- **install_k3s_agent_args**: the default is `''`.
+- **install_server_args**: the default is `''`.
+- **install_agent_args**: the default is `''`.
 
 ### Install Flags not yet implemented
 

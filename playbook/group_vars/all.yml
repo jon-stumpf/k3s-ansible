@@ -8,14 +8,14 @@ k3s_commit: "{{ install_k3s_commit | default('undefined') }}"
 k3s_channel_url: "{{ install_k3s_channel_url | default('https://update.k3s.io/v1-release/channels') }}"
 k3s_channel: "{{ install_k3s_channel | default('stable') }}"
 
-extra_server_args: "{{ install_k3s_server_args | default('') }}"
-extra_agent_args: "{{ install_k3s_agent_args | default('') }}"
+extra_server_args: "{{ install_server_args | default('') }}"
+extra_agent_args: "{{ install_agent_args | default('') }}"
 
 systemd_dir: "{{ install_k3s_systemd_dir | default('/etc/systemd/system') }}"
 bin_dir: "{{ install_k3s_bin_dir | default('/usr/local/bin') }}"
 data_dir: "{{ install_k3s_data_dir | default('/var/lib/rancher/k3s') }}"
 
-first_server: "{{ hostvars[groups['k3s_server'][0]]['ansible_host'] | default(groups['k3s_server'][0]) }}"
+first_server: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
 api_endpoint: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else first_server }}"
 api_port: "{{ cluster_port | default('6443') }}"
 

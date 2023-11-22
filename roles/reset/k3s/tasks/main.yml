@@ -18,7 +18,7 @@
   when:
     - ha_enabled
     - k3s_cluster_method != 'external'
-    - inventory_hostname in groups['k3s_server']
+    - inventory_hostname in groups['server']
 
 #
 # /usr/local/bin/k3s-killall.sh
@@ -87,7 +87,7 @@
       loop: "{{ stat_command_files.results }}"
       loop_control:
         label: "{{ item.item }}"
-  when: inventory_hostname in groups['k3s_server']
+  when: inventory_hostname in groups['server']
 
 # Remove files and directories
 - name: Remove files and data
@@ -108,5 +108,5 @@
   file:
     path: "~{{ ansible_user }}/.kube"
     state: absent
-  when: inventory_hostname in groups['k3s_server']
+  when: inventory_hostname in groups['server']
 

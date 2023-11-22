@@ -1,21 +1,17 @@
 ---
-k3s_server:
-  hosts:
-    10.0.0.20:
-    10.0.0.23:
-    10.0.0.26:
-
-k3s_agent:
-  hosts:
-    10.0.0.21:
-    10.0.0.22:
-    10.0.0.24:
-    10.0.0.25:
-
 k3s_cluster:
   children:
-    k3s_server:
-    k3s_agent:
+    server:
+      hosts:
+        10.0.0.20:
+        10.0.0.23:
+        10.0.0.26:
+    agent:
+      hosts:
+        10.0.0.21:
+        10.0.0.22:
+        10.0.0.24:
+        10.0.0.25:
 
   # See inventory-examples/README.md for more options.
   # If there are no vars, default values will be used for all mandatory fields.
