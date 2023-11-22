@@ -69,8 +69,8 @@ Please, try it out.
 | ha/etcd               | HA-only    |                    | unknown            | *under review*     | 3        | 1     | -     |
 | ha/keepalived         | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 1        | 1     | -     |
 | ha/kube-vip           | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 3     | -     |
-| k3s/server            | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
-| k3s/agent             | install    | :heavy_check_mark: | :heavy_check_mark: |                    | -        | -     | -     |
+| k3s_server            | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
+| k3s_agent             | install    | :heavy_check_mark: | :heavy_check_mark: |                    | -        | -     | -     |
 | reset/download        | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 1     | -     |
 | reset/ha/keepalived   | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *by reference*     | -        | -     | -     |
 | reset/ha/kube-vip     | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *by reference*     | 3        | 1     | -     |

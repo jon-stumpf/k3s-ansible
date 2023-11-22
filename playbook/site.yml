@@ -16,7 +16,7 @@
   gather_facts: no
   become: yes
   roles:
-    - role: k3s/server
+    - role: k3s_server
 
 - name: Fetch cluster config and wait for control-plane before setting up agents
   hosts: 127.0.0.1
@@ -30,5 +30,5 @@
   gather_facts: no
   become: yes
   roles:
-    - role: k3s/agent
+    - role: k3s_agent
 
