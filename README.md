@@ -6,9 +6,7 @@ Author: <https://github.com/itwars>
 
 The goal of *k3s-ansible* is to easily install a Kubernetes cluster on a variety of
 operating systems running on machines with different architectures.
-In general, users of *k3s-ansible* should only need to edit two files:
-- `inventory/sample/group_vars/all.yml`
-- `inventory/sample/hosts.ini`
+In general, users of *k3s-ansible* should only need to create/edit one file: `inventory.yml`.
 
 All you need to get started is a list of IP addresses for the hosts that you want to
 participate in the cluster and a username that has password-less *ssh* access to all
@@ -46,34 +44,41 @@ Here is what has been tested (:heavy_check_mark:) with *k3s-ansible*.
 
 ## Usage
 
-1. Create a new cluster definition based on the `inventory/sample` directory.
+1. Create a new cluster definition based on the `inventory-examples/sample.yml` file.
 
 ```bash
-cp -R inventory/sample inventory/my-cluster
+cp inventory-examples/sample.yml inventory.yml
 ```
 
-2. Edit `inventory/my-cluster/hosts.ini` to include the hosts that will make up your new cluster.\
+2. Edit `inventory.yml` to include the hosts that will make up your new cluster and
+add variables to customize the install to best suit your environment.
+See, `inventory-examples/README.md` for more details.\
 For example:
 
 ```bash
-[k3s_server]
-192.16.35.12
+---
+k3s_cluster:
+  children:
+    server:
+      hosts:
+        192.168.1.26:
+    agent:
+      hosts:
+        192.168.1.34:
+        192.168.1.39:
+        192.168.1.16:
+        192.168.1.32:
 
-[k3s_agent]
-192.16.35.[10:11]
-
-[k3s_cluster:children]
-k3s_server
-k3s_agent
+  vars:
+    ansible_user: debian
+    cluster_config: cluster.conf
+    install_k3s_channel: 'latest'
 ```
 
-3. Edit `inventory/my-cluster/group_vars/all.yml` to best match your environment.\
-See, `inventory/sample/group_vars/README.md` for more details.
-
-4. Provision your new cluster.
+3. Provision your new cluster.
 
 ```bash
-ansible-playbook playbook/site.yml -i inventory/my-cluster/hosts.ini
+ansible-playbook playbook/site.yml
 ```
 
 ## Kubeconfig
@@ -92,6 +97,6 @@ See the [HA-embedded documentation](https://rancher.com/docs/k3s/latest/en/insta
 
 HA expects that there is a virtual IP (**ha_cluster_vip**) in front of the *control-plane* servers.
 A few methods have been implemented to provide and manage this VIP.
-See `inventory/turingpi` for my example HA setup on my Turing Pi v1.
-See `inventory/sample/group_vars/README.md` for more details on variables.
+See `inventory-examples/sample-ha.yml` for my example HA setup on my Turing Pi v1.
+See `inventory-examples/README.md` for more details on variables.
 
