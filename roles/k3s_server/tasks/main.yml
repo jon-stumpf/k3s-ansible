@@ -16,7 +16,7 @@
 - name: Copy K3s service file
   register: k3s_service
   ansible.builtin.template:
-    src: "k3s.service.j2"
+    src: "k3s-server.service.j2"
     dest: "{{ systemd_dir }}/k3s.service"
     owner: root
     group: root
