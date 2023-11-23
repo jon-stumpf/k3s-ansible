@@ -111,14 +111,14 @@
 # Ensure non-local binding is enabled
 
 - name: Ensure ipv4 nonlocal binding is enabled
-  ansible.builtin.sysctl:
+  ansible.posix.sysctl:
     name: net.ipv4.ip_nonlocal_bind
     value: "1"
     state: present
     reload: true
 
 - name: Ensure ipv6 nonlocal binding is enabled
-  ansible.builtin.sysctl:
+  ansible.posix.sysctl:
     name: net.ipv6.ip_nonlocal_bind
     value: "1"
     state: present
