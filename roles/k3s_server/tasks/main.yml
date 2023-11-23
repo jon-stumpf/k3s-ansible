@@ -49,3 +49,14 @@
   when:
     - ha_enabled
     - k3s_cluster_method != 'external'
+
+######################################################################################
+# Wait for control plane at {{ api_endpoint }}:{{ api_port }} before setting up agents
+#
+
+- name: Wait for control plane at {{ api_endpoint }}:{{ api_port }}
+  wait_for:
+    host: "{{ api_endpoint }}"
+    port: "{{ api_port }}"
+    timeout: 60
+

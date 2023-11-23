@@ -61,7 +61,6 @@ Please, try it out.
 
 | Role                  | Role Type  | Idempotent         | Only Real Changes  | Defaults           | commands | TODOs | BUGs  |
 | :-------------------- | :--------: | :---:              | :---:              | :---:              | :---:    | :---: | :---: |
-| cluster-config        | install    | :heavy_check_mark: | :heavy_check_mark: |                    | -        | -     | -     |
 | config-check          | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
 | prereq                | install    | :heavy_check_mark: | :heavy_check_mark: | **n/a**            | -        | -     | -     |
 | download              | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |

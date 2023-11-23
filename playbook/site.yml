@@ -18,13 +18,6 @@
   roles:
     - role: k3s_server
 
-- name: Fetch cluster config and wait for control-plane before setting up agents
-  hosts: 127.0.0.1
-  connection: local
-  gather_facts: no
-  roles:
-    - role: cluster-config
-
 - name: Install the k3s agents
   hosts: agent
   gather_facts: no
