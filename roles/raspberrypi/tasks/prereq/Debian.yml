@@ -18,7 +18,7 @@
     state: present
 
 - name: Flush iptables before changing to iptables-legacy
-  iptables:
+  ansible.builtin.iptables:
     flush: true
   changed_when: false   # iptables flush always returns changed
 
