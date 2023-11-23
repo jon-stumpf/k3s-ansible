@@ -1,0 +1,33 @@
+---
+################################################################################
+# Create ctl commands
+#
+
+- name: Copy k3s.sh for symlink'd commands
+  register: k3s_symlink
+  ansible.builtin.template:
+    src: "k3s.sh.j2"
+    dest: "{{ bin_dir }}/k3s.sh"
+    owner: root
+    group: root
+    mode: "u=rwx,g=rx,o=rx"
+  when:
+    - data_dir is defined
+    - data_dir != '/var/lib/rancher/k3s'
+    - not ansible_check_mode
+
+- name: Determine k3s bin target
+  ansible.builtin.set_fact:
+    k3s_bin_target: "{{ '{{ bin_dir }}/k3s.sh' if data_dir != '/var/lib/rancher/k3s' else '{{ bin_dir }}/k3s' | default('{{ bin_dir }}/k3s') }}"
+
+- name: Create symlink'd commands (kubectl, crictl, ctr)
+  file:
+    src: "{{ k3s_bin_target }}"
+    dest: "{{ bin_dir }}/{{ item }}"
+    state: link
+  with_items:
+    - kubectl
+    - crictl
+    - ctr
+  when: not ansible_check_mode
+

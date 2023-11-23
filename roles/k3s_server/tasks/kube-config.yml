@@ -1,0 +1,73 @@
+---
+################################################################################
+# Setup ~{{ ansible_user }}/.kube/config
+#
+
+- name: Setup ~{{ ansible_user }}/.kube/config
+  block:
+    - name: Create local kube directory, {{ path }}
+      vars:
+        path: "~{{ ansible_user }}/.kube"
+      file:
+        path: "{{ path }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        mode: "u=rwx,g=rx,o="
+
+    - block:
+        # Use a temporary file so that the node is marked 'changed' only when the
+        # kubeconfig file is new or different.  See task "Copy kubeconfig file" below.
+
+        - name: Create temporary file for kube config
+          ansible.builtin.tempfile:
+            state: file
+          register: tempfile
+          changed_when: false
+
+        - name: Copy node kubeconfig to tempfile, {{ src }} to {{ dest }}
+          vars:
+            src: "/etc/rancher/k3s/k3s.yaml"
+            dest: "{{ tempfile.path }}"
+          copy:
+            remote_src: true
+            src: "{{ src }}"
+            dest: "{{ dest }}"
+          changed_when: false
+
+        - name: Replace https://localhost:{{ api_port }} with https://{{ api_endpoint }}:{{ api_port }}
+          ansible.builtin.command: >-
+            {{ bin_dir }}/kubectl config set-cluster default
+              --server=https://{{ api_endpoint }}:{{ api_port }}
+              --kubeconfig {{ tempfile.path }}
+          changed_when: false
+
+        - name: Copy kubeconfig file, {{ src }}, to {{ dest }}
+          vars:
+            src: "{{ tempfile.path }}"
+            dest: "~{{ ansible_user }}/.kube/config"
+          copy:
+            remote_src: true
+            src: "{{ src }}"
+            dest: "{{ dest }}"
+            owner: "{{ ansible_user }}"
+            mode: "u=rw,g=,o="
+
+        - name: Remove tempfile, {{ tempfile.path }}
+          file:
+            path: "{{ tempfile.path }}"
+            state: absent
+          changed_when: false
+
+    # Fetch a copy of the cluster config for use in one's ~/.kube/config.
+    # The playbook will update the IP address using the cluster-config role.
+    - name: Fetch {{ src }} for use in one's ~/.kube/config
+      vars:
+        src: "/etc/rancher/k3s/k3s.yaml"
+      fetch:
+        src: "{{ src }}"
+        dest: "{{ k3s_cluster_config }}.tmp"
+        flat: true
+      run_once: true
+      changed_when: false
+  when: not ansible_check_mode
+
