@@ -19,7 +19,7 @@
       vars:
         src: "/etc/rancher/k3s/k3s.yaml"
         dest: "{{ tempfile.path }}"
-      copy:
+      ansible.builtin.copy:
         remote_src: true
         src: "{{ src }}"
         dest: "{{ dest }}"
@@ -68,7 +68,7 @@
       vars:
         src: "{{ k3s_cluster_config }}"
         dest: "~{{ ansible_user }}/.kube/config"
-      copy:
+      ansible.builtin.copy:
         src: "{{ src }}"
         dest: "{{ dest }}"
         owner: "{{ ansible_user }}"

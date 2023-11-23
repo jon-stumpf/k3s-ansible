@@ -99,7 +99,7 @@
 - name: Copy the kubeconfig, {{ keepalived_kubeconfig_src }}, to {{ path }}
   vars:
     path: "{{ keepalived_lib_dir }}/{{ keepalived_script_kubeconfig }}"
-  copy:
+  ansible.builtin.copy:
     remote_src: true
     src: "{{ keepalived_kubeconfig_src }}"
     dest: "{{ path }}"
