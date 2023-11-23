@@ -9,7 +9,7 @@
 - name: Stop keepalived service
   service:
     name: keepalived
-    enabled: no
+    enabled: false
     state: stopped
 
 ##################################
@@ -31,8 +31,8 @@
   user:
     name: "{{ keepalived_script_user }}"
     state: absent
-    remove: yes
-    force: yes
+    remove: true
+    force: true
 
 ##################################
 # Uninstall the keepalived package

@@ -19,9 +19,9 @@
     comment: "User to run keepalived scripts"
     home: "{{ keepalived_lib_dir }}"
     shell: "{{ keepalived_script_login }}"
-    append: no
-    create_home: no
-    system: yes
+    append: false
+    create_home: false
+    system: true
 
 ##################################
 # Install/Update the configuration
@@ -100,7 +100,7 @@
   vars:
     path: "{{ keepalived_lib_dir }}/{{ keepalived_script_kubeconfig }}"
   copy:
-    remote_src: yes
+    remote_src: true
     src: "{{ keepalived_kubeconfig_src }}"
     dest: "{{ path }}"
     owner: "{{ keepalived_script_user }}"
@@ -115,14 +115,14 @@
     name: net.ipv4.ip_nonlocal_bind
     value: "1"
     state: present
-    reload: yes
+    reload: true
 
 - name: Ensure ipv6 nonlocal binding is enabled
   ansible.builtin.sysctl:
     name: net.ipv6.ip_nonlocal_bind
     value: "1"
     state: present
-    reload: yes
+    reload: true
 
 ###################
 # Start the service
@@ -131,7 +131,7 @@
   register: started
   service:
     name: keepalived
-    enabled: yes
+    enabled: true
     state: started
 
 ##############################################

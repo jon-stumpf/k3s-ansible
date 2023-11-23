@@ -35,13 +35,13 @@
   ansible.builtin.systemd:
     name: "{{ item }}"
     state: stopped
-    enabled: no
+    enabled: false
   failed_when: false
   loop: "{{ k3s_services }}"
 
 - name: daemon_reload
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
 
 #
 # rm -f /etc/systemd/system/k3s.service

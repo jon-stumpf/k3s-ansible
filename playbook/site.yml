@@ -2,8 +2,8 @@
 
 - name: Prepare hosts for k3s installation
   hosts: k3s_cluster
-  gather_facts: yes
-  become: yes
+  gather_facts: true
+  become: true
   roles:
     - role: config-check
       run_once: true
@@ -13,15 +13,15 @@
 
 - name: Install the k3s servers
   hosts: server
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   roles:
     - role: k3s_server
 
 - name: Install the k3s agents
   hosts: agent
-  gather_facts: no
-  become: yes
+  gather_facts: false
+  become: true
   roles:
     - role: k3s_agent
 

@@ -4,6 +4,6 @@
   service:
     name: keepalived
     state: restarted
-    enabled: yes
+    enabled: true
   listen: restart-keepalived-service
 
