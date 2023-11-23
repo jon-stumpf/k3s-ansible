@@ -1,6 +1,7 @@
 # Build a Kubernetes cluster using *k3s* with *ansible*
 
-Author: <https://github.com/itwars>
+Author: <https://github.com/itwars>\
+Current Maintainer: <https://github.com/dereknola>
 
 ## Introduction to *k3s-ansible*
 
@@ -88,6 +89,16 @@ To get access to your new **Kubernetes** cluster, just use the generated kube co
 ```bash
 kubectl --kubeconfig playbook/cluster.conf ...
 ```
+
+## Local Testing
+
+A Vagrantfile is provided that provision a 5 nodes cluster using Vagrant (LibVirt or Virtualbox as provider). To use it:
+
+```bash
+vagrant up
+```
+
+By default, each node is given 2 cores and 2GB of RAM and runs Ubuntu 20.04. You can customize these settings by editing the `Vagrantfile`.
 
 ## High Availability
 *k3s-ansible* can now configure a high-availability (HA) cluster.

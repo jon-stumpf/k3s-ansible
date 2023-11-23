@@ -23,19 +23,28 @@ I implemented the HA embedded database using *etcd* and three cluster VIP method
 2. **kube-vip**: uses [kube-vip](https://kube-vip.io/) with arp arbitration
 3. **keepalived**: uses [keepalived](https://www.redhat.com/sysadmin/keepalived-basics) to implement VRRP
 
+These changes have now been merged onto my [master](https://github.com/jon-stumpf/k3s-ansible/tree/master).
+This branch is stable.
+
 I have reached out to
 [itwars](https://github.com/itwars) and
 [St0rmingBr4in](https://github.com/St0rmingBr4in) to get their feedback on this work and
 to collaborate on closing the open issues and pull requests.
-In the meantime, I would like others to provide feedback on my
-[k3s-ha](https://github.com/jon-stumpf/k3s-ansible/tree/k3s-ha) branch.
-This is now stable and incorporates all my previous work on *k3s-ansible* except for a few commits.
+I heard nothing back for almost two years until [dereknola](https://github.com/dereknola) informed
+me that he is now a maintainer for this repository.
+He unfortunately cancelled my pull requests and asked that I update/rebase my repository and resubmit.
+I am in the process of doing that now (11/23/2023).
+
+The *rebase* work is happening on the [rebase-upstream](https://github.com/jon-stumpf/k3s-ansible/tree/rebase-upstream) branch.
+This branch is stable and incorporates all my previous work on *k3s-ansible* as well as tested changes that get
+this repository closer to upstream.
+I would like others to provide feedback on my work.
 Please, try it out.
 
 # TODO
 
 1. Make all roles *idempotent* and not report changes when none, in fact, are needed or material.
-2. Add *keepalived*' label to servers when using keepalived;  Add the following annotations:
+2. Add *keepalived* label to servers when using keepalived;  Add the following annotations:
     - `keepalived/vrrp_instance=<name>`
     - `keepalived/master=[true|false]`
     - `keepalived/version=<version>`
@@ -56,6 +65,7 @@ Please, try it out.
     - The `reset/download` role deletes it.
 9. Document lesser switches to control behavior of roles (e.g., remove_packages)
 10. Create playbooks for other common operations beyond install/uninstall
+11. Create README.md files to document variables used by each HA method.
 
 # Progress Report
 
@@ -65,7 +75,7 @@ Please, try it out.
 | prereq                | install    | :heavy_check_mark: | :heavy_check_mark: | **n/a**            | -        | -     | -     |
 | download              | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
 | raspberrypi           | install    | :heavy_check_mark: | :heavy_check_mark: | **n/a**            | 2        | 1     | -     |
-| ha/etcd               | HA-only    |                    | unknown            | *under review*     | 3        | 1     | -     |
+| ha/etcd               | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 3        | 1     | -     |
 | ha/keepalived         | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 1        | 1     | -     |
 | ha/kube-vip           | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 3     | -     |
 | k3s_server            | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
@@ -73,5 +83,5 @@ Please, try it out.
 | reset/download        | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 1     | -     |
 | reset/ha/keepalived   | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *by reference*     | -        | -     | -     |
 | reset/ha/kube-vip     | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *by reference*     | 3        | 1     | -     |
-| reset/k3s             | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 9        | 1     | 2     |
+| reset/k3s             | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 9        | 1     | -     |
 
