@@ -57,7 +57,9 @@
 # "ip -j netns show master cni0" does not always report "[ ]" but returns 0 when there is no master.
 #
 - name: Remove CNI namespaces
-  ansible.builtin.command: ip netns delete {{ item }}
+  community.general.ip_netns:
+    name: '{{ item }}'
+    state: absent
   loop: "{{ (ip_netns_show.stdout if ip_netns_show.stdout != '' else  '[ ]') | from_json | json_query('[*].name') }}"
 
 #
