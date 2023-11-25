@@ -39,7 +39,7 @@
 - name: Set detected_distribution_major_version
   ansible.builtin.set_fact:
     detected_distribution_major_version: "{{ ansible_facts.lsb.major_release }}"
-  when: > 
+  when: >
     ( detected_distribution | default("") == "Raspbian" or
       detected_distribution | default("") == "Debian" )
 

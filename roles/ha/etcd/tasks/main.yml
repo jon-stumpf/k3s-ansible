@@ -27,7 +27,9 @@
   block:
     - name: Verify that all nodes actually joined (check k3s-init.service if this fails)
       ansible.builtin.command:
-        cmd: "{{ bin_dir }}/k3s kubectl get nodes -l 'node-role.kubernetes.io/master=true' -o=jsonpath='{.items[*].metadata.name}'"
+        cmd: "{{ bin_dir }}/k3s kubectl get nodes \
+                                        -l 'node-role.kubernetes.io/master=true' \
+                                        -o=jsonpath='{.items[*].metadata.name}'"
       when: not ansible_check_mode
       run_once: true
       register: nodes

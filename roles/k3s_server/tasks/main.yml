@@ -26,7 +26,7 @@
   ansible.builtin.systemd:
     name: k3s
     daemon_reload: "{{ true if k3s_service.changed else false }}"
-    state:  "{{ 'restarted' if k3s_service.changed else 'started' }}"
+    state: "{{ 'restarted' if k3s_service.changed else 'started' }}"
     enabled: true
 
 - name: Perform node-token tasks
