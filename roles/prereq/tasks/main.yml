@@ -58,8 +58,8 @@
   when: ansible_distribution in ['Ubuntu']
 
 - name: Install additional packages
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
-    state: latest
+    state: present
     update_cache: true
   with_items: "{{ install_additional_packages | default([]) }}"
