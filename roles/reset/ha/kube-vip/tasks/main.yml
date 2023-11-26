@@ -18,7 +18,7 @@
 
     - name: Remove kube-vip resources found in {{ path }}
       register: resources
-      ansible.builtin.shell: "{{ bin_dir }}/kubectl delete -f {{ path }}"
+      ansible.builtin.command: "{{ bin_dir }}/kubectl delete -f {{ path }}"
       run_once: true
       when:
         - manifest_dir.stat.isdir is defined
