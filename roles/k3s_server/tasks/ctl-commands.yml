@@ -18,6 +18,7 @@
 
 - name: Determine k3s bin target
   ansible.builtin.set_fact:
+    # yamllint disable-line rule:line-length
     k3s_bin_target: "{{ '{{ bin_dir }}/k3s.sh' if data_dir != '/var/lib/rancher/k3s' else '{{ bin_dir }}/k3s' | default('{{ bin_dir }}/k3s') }}"
 
 - name: Create symlink'd commands (kubectl, crictl, ctr)

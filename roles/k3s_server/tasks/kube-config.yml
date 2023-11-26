@@ -23,6 +23,7 @@
         remote_src: true
         src: "{{ src }}"
         dest: "{{ dest }}"
+        mode: "u=rw,g=,o="
       changed_when: false
 
     - name: Replace https://localhost:{{ api_port }} with https://{{ api_endpoint }}:{{ api_port }}
