@@ -5,11 +5,5 @@
     backrefs: true
     regexp: '^((?!.*\bcgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory\b).*)$'
     line: '\1 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory'
-  register: cgroup_support
+  notify: Regenerate bootloader image
 
-- name: Regenerate bootloader image
-  ansible.builtin.shell: ./mkscr
-  args:
-    chdir: /boot
-  notify: Reboot Pi
-  when: cgroup_support.changed
