@@ -33,14 +33,14 @@
   with_items: "{{ install_additional_packages | default([]) }}"
 
 - name: Remove yum repo files
-  shell: 'rm -f /etc/yum.repos.d/rancher-k3s-common*.repo'
+  ansible.builtin.shell: 'rm -f /etc/yum.repos.d/rancher-k3s-common*.repo'
   register: remove_repo_files
   when:
     - ansible_pkg_mgr == "yum"
     - remove_packages | bool
 
 - name: Remove zypper repo files
-  shell: 'rm -f /etc/zypp/repos.d/rancher-k3s-common*.repo'
+  ansible.builtin.shell: 'rm -f /etc/zypp/repos.d/rancher-k3s-common*.repo'
   register: remove_repo_files
   when:
     - ansible_pkg_mgr == "zypper"

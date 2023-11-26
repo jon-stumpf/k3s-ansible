@@ -8,7 +8,7 @@
   register: cgroup_support
 
 - name: Regenerate bootloader image
-  shell: ./mkscr
+  ansible.builtin.shell: ./mkscr
   args:
     chdir: /boot
   notify: Reboot Pi

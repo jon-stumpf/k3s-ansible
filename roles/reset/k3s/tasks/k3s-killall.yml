@@ -72,7 +72,7 @@
 #
 - name: Get list of network interface(s) that match 'master cni0'
   register: ip_link_show
-  shell: ip -j link show master cni0 || echo "[ ]"
+  ansible.builtin.shell: ip -j link show master cni0 || echo "[ ]"
   changed_when: false
 
 - name: Remove CNI interfaces
