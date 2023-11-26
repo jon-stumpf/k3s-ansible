@@ -48,7 +48,7 @@
 # rm -f /etc/systemd/system/k3s.service.env
 #
 - name: Remove service files
-  file:
+  ansible.builtin.file:
     path: "{{ systemd_dir }}/{{ item }}"
     state: absent
   loop: "{{ k3s_services | product(k3s_service_file_extensions) | map('join', '.') }}"
@@ -80,7 +80,7 @@
         - ctr
 
     - name: Remove command files
-      file:
+      ansible.builtin.file:
         path: "{{ item.stat.path }}"
         state: absent
       when: (item.stat.exists | default(false)) and (item.stat.islnk | default(false))
@@ -91,7 +91,7 @@
 
 # Remove files and directories
 - name: Remove files and data
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:
@@ -105,7 +105,7 @@
     - "{{ bin_dir }}/k3s-uninstall.sh"  # From https://get.k3s.io
 
 - name: Remove ~{{ ansible_user }}/.kube directory
-  file:
+  ansible.builtin.file:
     path: "~{{ ansible_user }}/.kube"
     state: absent
   when: inventory_hostname in groups['server']

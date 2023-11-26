@@ -93,7 +93,7 @@
     - flannel-v6.1
 
 - name: Remove CNI files
-  file:
+  ansible.builtin.file:
     path: /var/lib/cni
     state: absent
 

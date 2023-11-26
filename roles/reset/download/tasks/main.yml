@@ -1,7 +1,7 @@
 ---
 
 - name: Remove downloaded k3s binary
-  file:
+  ansible.builtin.file:
     path: "{{ bin_dir }}/k3s"
     state: absent
   when: remove_packages | bool

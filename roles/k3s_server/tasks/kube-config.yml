@@ -43,7 +43,7 @@
         flat: true
 
     - name: Remove tempfile, {{ tempfile.path }}
-      file:
+      ansible.builtin.file:
         path: "{{ tempfile.path }}"
         state: absent
       changed_when: false
@@ -59,7 +59,7 @@
     - name: Create local kube directory, {{ path }}
       vars:
         path: "~{{ ansible_user }}/.kube"
-      file:
+      ansible.builtin.file:
         path: "{{ path }}"
         state: directory
         owner: "{{ ansible_user }}"

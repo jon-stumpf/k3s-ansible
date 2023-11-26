@@ -27,7 +27,7 @@
 # Install/Update the configuration
 
 - name: Create keepalived etc directory, {{ keepalived_etc_dir }}
-  file:
+  ansible.builtin.file:
     path: "{{ keepalived_etc_dir }}"
     state: directory
     owner: root
@@ -35,7 +35,7 @@
     mode: "u=rwx,g=,o="
 
 - name: Create keepalived lib directory, {{ keepalived_lib_dir }}
-  file:
+  ansible.builtin.file:
     path: "{{ keepalived_lib_dir }}"
     state: directory
     owner: "{{ keepalived_script_user }}"
@@ -88,7 +88,7 @@
 - name: Create keepalived k3s script output file, {{ path }}
   vars:
     path: "{{ keepalived_run_dir }}/{{ keepalived_script_output }}"
-  file:
+  ansible.builtin.file:
     path: "{{ path }}"
     state: touch
     owner: "{{ keepalived_script_user }}"

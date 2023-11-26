@@ -16,7 +16,7 @@
 # Delete the configuration
 
 - name: Delete the keepalived configuration
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:

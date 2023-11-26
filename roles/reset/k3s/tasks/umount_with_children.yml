@@ -16,7 +16,7 @@
     "{{ get_mounted_filesystems.stdout_lines | reverse | list }}"
 
 - name: Remove mountpoints
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   with_items: "{{ get_mounted_filesystems.stdout_lines | reverse | list }}"

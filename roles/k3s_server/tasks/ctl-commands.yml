@@ -22,7 +22,7 @@
     k3s_bin_target: "{{ '{{ bin_dir }}/k3s.sh' if data_dir != '/var/lib/rancher/k3s' else '{{ bin_dir }}/k3s' | default('{{ bin_dir }}/k3s') }}"
 
 - name: Create symlink'd commands (kubectl, crictl, ctr)
-  file:
+  ansible.builtin.file:
     src: "{{ k3s_bin_target }}"
     dest: "{{ bin_dir }}/{{ item }}"
     state: link
