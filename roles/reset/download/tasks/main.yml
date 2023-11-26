@@ -11,37 +11,33 @@
 #       Are these tasks even necessary?
 #
 - name: Remove package k3s-selinux
-  yum:
+  ansible.builtin.package:
     name: k3s-selinux
-    state: remove
-  when:
-    - ansible_pkg_mgr == "yum"
-    - remove_packages | bool
-
-- name: Remove package k3s-selinux
-  zypper:
-    name: k3s-selinux
-    state: remove
-  when:
-    - ansible_pkg_mgr == "zypper"
-    - remove_packages | bool
+    state: absent
+  when: remove_packages | bool
 
 - name: Remove additional packages
-  package:
+  ansible.builtin.package:
     name: "{{ item }}"
     state: absent
   with_items: "{{ install_additional_packages | default([]) }}"
 
 - name: Remove yum repo files
-  ansible.builtin.shell: 'rm -f /etc/yum.repos.d/rancher-k3s-common*.repo'
-  register: remove_repo_files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "/etc/yum.repos.d/rancher-k3s-common*.repo"
   when:
     - ansible_pkg_mgr == "yum"
     - remove_packages | bool
 
 - name: Remove zypper repo files
-  ansible.builtin.shell: 'rm -f /etc/zypp/repos.d/rancher-k3s-common*.repo'
-  register: remove_repo_files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "/etc/zypp/repos.d/rancher-k3s-common*.repo"
   when:
     - ansible_pkg_mgr == "zypper"
     - remove_packages | bool
