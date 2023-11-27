@@ -1,11 +1,11 @@
 ---
 
-###################################################
-# TODO: Implement way to determine 'latest' version
-#       to download.
-
 ###############################################
-# Recommended in https://kube-vip.io/usage/k3s/
+# TODO: Implement a way to determine
+#       'latest' version to download.
+
+####################################################
+# Recommended in https://kube-vip.io/docs/usage/k3s/
 # See "Clean Environment".
 
 - name: Reset local interface
@@ -20,35 +20,41 @@
 # Deploy kube-vip manifests
 # TODO: Figure out how to do this using kubernetes.core
 
-- name: Create manifest directory {{ path }}
-  vars:
-    path: "{{ data_dir }}/server/manifests/{{ k3s_cluster_method }}"
-  ansible.builtin.file:
-    path: "{{ path }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "u=rwx,g=,o="
-  register: manifest_dir
-
-# TODO: Should we download this instead? (See Step 2, https://kube-vip.chipzoller.dev/docs/usage/k3s/)
-- name: Copy RBAC manifest
-  ansible.builtin.template:
-    src: "kube-vip-rbac.yaml.j2"
-    dest: "{{ manifest_dir.path }}/kube-vip-rbac.yaml"
-    owner: root
-    group: root
-    mode: "u=rw,g=,o="
-
-- name: Copy arp daemonset manifest
-  ansible.builtin.template:
-    src: "kube-vip-arp-ds.yaml.j2"
-    dest: "{{ manifest_dir.path }}/kube-vip-arp-ds.yaml"
-    owner: root
-    group: root
-    mode: "u=rw,g=,o="
-
-- name: Apply kube-vip manifests
-  ansible.builtin.command: "{{ bin_dir }}/k3s kubectl apply -f {{ manifest_dir.path }}"
+- name: Start kube-vip
   run_once: true
+  block:
+    - name: Create manifest directory {{ path }}
+      vars:
+        path: "{{ data_dir }}/server/manifests/{{ k3s_cluster_method }}"
+      ansible.builtin.file:
+        path: "{{ path }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "u=rwx,g=,o="
+      register: manifest_dir
 
+    # TODO: Should we download this instead?
+    # (See https://kube-vip.io/docs/usage/k3s/#step-2-upload-kube-vip-rbac-manifest)
+    - name: Copy RBAC manifest
+      ansible.builtin.template:
+        src: "kube-vip-rbac.yaml.j2"
+        dest: "{{ manifest_dir.path }}/kube-vip-rbac.yaml"
+        owner: root
+        group: root
+        mode: "u=rw,g=,o="
+
+    # TODO: Should we generate this instead?
+    # (See https://kube-vip.io/docs/installation/daemonset/#arp-example-for-daemonset).
+    - name: Copy arp daemonset manifest
+      ansible.builtin.template:
+        src: "kube-vip-arp-ds.yaml.j2"
+        dest: "{{ manifest_dir.path }}/kube-vip-arp-ds.yaml"
+        owner: root
+        group: root
+        mode: "u=rw,g=,o="
+
+    - name: Apply kube-vip manifests
+      ansible.builtin.command: "{{ bin_dir }}/k3s kubectl apply -R -f {{ manifest_dir.path }}"
+      when: manifest_dir is defined
+      changed_when: false

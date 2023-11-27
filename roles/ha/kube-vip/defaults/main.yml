@@ -1,24 +1,24 @@
 ---
-
 # This file is used to configure the kube-vip manifest files.  It typically does
 # not need to be changed but you can at your discretion to suit your environment.
-# These variables are used only when HA is enabled and the method chosen is kube-vip.
-# More options can be found in ../templates//kube-vip-arp-ds.yaml.j2
+# These variables are used only when HA is enabled and the method chosen is 'kube-vip'.
+# More options can be found at https://kube-vip.io/docs/installation/flags/.
+# Even more options can be found by running 'kube-vip manifest daemonset --help'.
+# (See https://kube-vip.io/docs/installation/daemonset/#arp-example-for-daemonset).
 
 # These are commonly changed values for kube-vip.
-kube_vip_version: 'v0.4.0'
-kube_vip_interface: "{{ ansible_default_ipv4.interface }}"
+kube_vip_version: 'v0.6.3'
+
+kube_vip_address: "{{ ha_cluster_vip | default('127.0.0.1') }}"
+kube_vip_subnet: "{{ ha_cluster_subnet_mask | default('/24') }}"
 
 # These are less commonly changed values for kube-vip.
-kube_vip_cidr: '32'
-kube_vip_leaseduration: '5'
-kube_vip_renewdeadline: '3'
-kube_vip_retryperiod: '1'
-
 kube_vip_namespace: 'kube-system'
-kube_vip_daemonset_name: 'kube-vip-ds'
-kube_vip_container_name: 'kube-vip'
-kube_vip_serviceaccount_name: 'kube-vip'
-kube_vip_clusterrole_name: 'kube-vip-role'
-kube_vip_clusterrolebinding_name: 'kube-vip-binding'
 
+kube_vip_interface: "{{ ansible_default_ipv4.interface }}"
+
+kube_vip_port: '{{ api_port }}'
+kube_vip_port_lb: '{{ api_port }}'
+
+kube_vip_enable_lb: true
+kube_vip_enable_labeling: true

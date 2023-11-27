@@ -18,8 +18,9 @@
 
     - name: Remove kube-vip resources found in {{ path }}
       register: resources
-      ansible.builtin.command: "{{ bin_dir }}/kubectl delete -f {{ path }}"
+      ansible.builtin.command: "{{ bin_dir }}/kubectl delete -R -f {{ path }}"
       run_once: true
+      failed_when: false
       when:
         - manifest_dir.stat.isdir is defined
         - manifest_dir.stat.isdir
@@ -30,14 +31,15 @@
         path: "{{ path }}"
         state: absent
 
-###################################
+####################################
 # Remove cluster VIP from interface
-# kube-vip does not do this for you
+# kube-vip does not do this for you.
 
-- name: Remove {{ ha_cluster_vip }}/{{ kube_vip_cidr }} from {{ kube_vip_interface }}
-  ansible.builtin.command: "ip address delete {{ ha_cluster_vip }}/{{ kube_vip_cidr }} dev {{ kube_vip_interface }}"
+- name: Remove {{ kube_vip_address }}{{ kube_vip_subnet }} from {{ kube_vip_interface }}
+  ansible.builtin.command: "ip address delete {{ kube_vip_address }}{{ kube_vip_subnet }} dev {{ kube_vip_interface }}"
   register: ipaddr_delete
-  when: ha_cluster_vip in (ansible_all_ipv4_addresses | list)
+  when: kube_vip_address in (ansible_all_ipv4_addresses | list)
+  failed_when: false # TODO: Sometimes the address disappears before we get to it?  Perhaps, kube-vip does delete this now.
 
 ###############################################
 # Recommended in https://kube-vip.io/usage/k3s/
