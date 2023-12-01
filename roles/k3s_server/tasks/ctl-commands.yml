@@ -12,14 +12,13 @@
     group: root
     mode: "u=rwx,g=rx,o=rx"
   when:
-    - data_dir is defined
-    - data_dir != '/var/lib/rancher/k3s'
+    - data_dir != default_data_dir
     - not ansible_check_mode
 
 - name: Determine k3s bin target
   ansible.builtin.set_fact:
     # yamllint disable-line rule:line-length
-    k3s_bin_target: "{{ '{{ bin_dir }}/k3s.sh' if data_dir != '/var/lib/rancher/k3s' else '{{ bin_dir }}/k3s' | default('{{ bin_dir }}/k3s') }}"
+    k3s_bin_target: "{{ '{{ bin_dir }}/k3s.sh' if data_dir != default_data_dir else '{{ bin_dir }}/k3s' | default('{{ bin_dir }}/k3s') }}"
 
 - name: Create symlink'd commands (kubectl, crictl, ctr)
   ansible.builtin.file:

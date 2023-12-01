@@ -183,6 +183,22 @@
   ansible.builtin.shell: while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 10; done;
   when: ansible_distribution in ['Ubuntu']
 
+- name: Setup alternative K3s directory
+  when: data_dir != default_data_dir
+  block:
+    - name: Make parent of default data directory
+      ansible.builtin.file:
+        path: "{{ default_data_dir | dirname }}"
+        mode: 0755
+        state: directory
+    - name: Create symlink to default data directory
+      ansible.builtin.file:
+        src: "{{ data_dir }}"
+        dest: "{{ default_data_dir }}"
+        follow: false
+        force: true
+        state: link
+
 - name: Install additional packages
   ansible.builtin.package:
     name: "{{ item }}"
