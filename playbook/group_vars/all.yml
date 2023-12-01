@@ -1,7 +1,9 @@
 ---
 # These variables are not meant to be changed.
 # All changes should happen in "inventory.yml".
-
+#
+# TODO: clean up these variables -- perhaps, with dictionaries.
+#
 k3s_version: "{{ install_k3s_version | default('undefined') }}"
 k3s_commit: "{{ install_k3s_commit | default('undefined') }}"
 
@@ -10,6 +12,11 @@ k3s_channel: "{{ install_k3s_channel | default('stable') }}"
 
 extra_server_args: "{{ install_server_args | default('') }}"
 extra_agent_args: "{{ install_agent_args | default('') }}"
+
+extra_server_manifests: "{{ install_additional_server_manifests | default([]) }}"
+extra_agent_manifests: "{{ install_additional_agent_manifests | default([]) }}"
+extra_server_packages: "{{ install_additional_server_packages | default([]) }}"
+extra_agent_packages: "{{ install_additional_agent_packages | default([]) }}"
 
 # Added so that we can check when the default is not being used
 default_systemd_dir: '/etc/systemd/system'

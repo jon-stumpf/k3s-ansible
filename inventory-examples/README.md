@@ -112,11 +112,17 @@ Lastly, some install flags did not make sense to implement with *k3s-ansible*:
 | **INSTALL_K3S_SKIP_ENABLE**   | *k3s-ansible* always enables the service. |
 | **INSTALL_K3S_SKIP_START**    | *k3s-ansible* always starts the service. |
 
-### Install additional packages
+### k3s-ansible Install Flags
 
-List out additional packages to install on to servers and agents.
+A list of additional manifests to install on to servers and agents.
 
-- **install_additional_packages**: the default is `''`.
+- **install_additional_server_manifests**: the default is `[]`.
+- **install_additional_agent_manifests**: the default is `[]`.
+
+A list of additional packages to install on to servers and agents.
+
+- **install_additional_server_packages**: the default is `[]`.
+- **install_additional_agent_packages**: the default is `[]`.
 
 Example:
 ```
