@@ -1,4 +1,10 @@
 ---
+- name: Install Dependent Ubuntu Packages
+  when: ansible_distribution in ['Ubuntu']
+  ansible.builtin.apt:
+    name: policycoreutils  # Used by install script to restore SELinux context
+    update_cache: yes
+
 - name: Set SELinux to disabled state
   selinux:
     state: disabled
