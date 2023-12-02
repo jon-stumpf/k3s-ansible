@@ -242,3 +242,17 @@
         update_cache: true
       with_items: "{{ extra_agent_packages }}"
       when: inventory_hostname in groups['agent']
+
+- name: Setup optional config file
+  when: config_yaml is defined
+  block:
+    - name: Make config directory
+      ansible.builtin.file:
+        path: "/etc/rancher/k3s"
+        mode: 0755
+        state: directory
+    - name: Copy config values
+      ansible.builtin.copy:
+        content: "{{ config_yaml }}"
+        dest: "/etc/rancher/k3s/config.yaml"
+        mode: 0644

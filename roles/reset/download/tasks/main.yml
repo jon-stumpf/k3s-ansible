@@ -1,5 +1,11 @@
 ---
 
+- name: Remove optional config file
+  when: config_yaml is defined
+  ansible.builtin.copy:
+    path: "/etc/rancher/k3s/config.yaml"
+    state: absent
+
 - name: Remove downloaded k3s binary
   ansible.builtin.file:
     path: "{{ bin_dir }}/k3s"
