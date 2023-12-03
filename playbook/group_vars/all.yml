@@ -4,28 +4,41 @@
 #
 # TODO: clean up these variables -- perhaps, with dictionaries.
 #
+# install_* variables match INSTALL_* variables in k3s-install.sh.
+# extra_* variables are used to supplement arguments to the k3s executable,
+# provide additional manifests, and/or have additional packages installed.
+#
+# install_* and extra_* variables should be set in "inventory.yml".
+#
+
+# Added so that we can check when the default is not being used
+default_channel_url: 'https://update.k3s.io/v1-release/channels'
+default_channel: 'stable'
+
+default_systemd_dir: '/etc/systemd/system'
+default_bin_dir: '/usr/local/bin'
+default_data_dir: '/var/lib/rancher/k3s'
+
 k3s_version: "{{ install_k3s_version | default('undefined') }}"
 k3s_commit: "{{ install_k3s_commit | default('undefined') }}"
 
-k3s_channel_url: "{{ install_k3s_channel_url | default('https://update.k3s.io/v1-release/channels') }}"
-k3s_channel: "{{ install_k3s_channel | default('stable') }}"
+k3s_channel_url: "{{ install_k3s_channel_url | default(default_channel_url) }}"
+k3s_channel: "{{ install_k3s_channel | default(default_channel) }}"
 
+systemd_dir: "{{ install_k3s_systemd_dir | default(default_systemd_dir) }}"
+bin_dir: "{{ install_k3s_bin_dir | default(default_bin_dir) }}"
+# NOTE: k3s-install.sh does not support changing the data directory
+data_dir: "{{ install_k3s_data_dir | default(default_data_dir) }}"
+
+# These are used instead of INSTALL_K3S_EXEC
 extra_server_args: "{{ install_server_args | default('') }}"
 extra_agent_args: "{{ install_agent_args | default('') }}"
 
 extra_server_manifests: "{{ install_additional_server_manifests | default([]) }}"
 extra_agent_manifests: "{{ install_additional_agent_manifests | default([]) }}"
+
 extra_server_packages: "{{ install_additional_server_packages | default([]) }}"
 extra_agent_packages: "{{ install_additional_agent_packages | default([]) }}"
-
-# Added so that we can check when the default is not being used
-default_systemd_dir: '/etc/systemd/system'
-default_bin_dir: '/usr/local/bin'
-default_data_dir: '/var/lib/rancher/k3s'
-
-systemd_dir: "{{ install_k3s_systemd_dir | default(default_systemd_dir) }}"
-bin_dir: "{{ install_k3s_bin_dir | default(default_bin_dir) }}"
-data_dir: "{{ install_k3s_data_dir | default(default_data_dir) }}"
 
 first_server: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
 api_endpoint: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else first_server }}"
