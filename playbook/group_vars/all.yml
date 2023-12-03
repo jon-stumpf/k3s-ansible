@@ -31,14 +31,14 @@ bin_dir: "{{ install_k3s_bin_dir | default(default_bin_dir) }}"
 data_dir: "{{ install_k3s_data_dir | default(default_data_dir) }}"
 
 # These are used instead of INSTALL_K3S_EXEC
-extra_server_args: "{{ install_server_args | default('') }}"
-extra_agent_args: "{{ install_agent_args | default('') }}"
+k3s_server_args: "{{ extra_server_args | default('') }}"
+k3s_agent_args: "{{ extra_agent_args | default('') }}"
 
-extra_server_manifests: "{{ install_additional_server_manifests | default([]) }}"
-extra_agent_manifests: "{{ install_additional_agent_manifests | default([]) }}"
+k3s_server_manifests: "{{ extra_server_manifests | default([]) }}"
+k3s_agent_manifests: "{{ extra_agent_manifests | default([]) }}"
 
-extra_server_packages: "{{ install_additional_server_packages | default([]) }}"
-extra_agent_packages: "{{ install_additional_agent_packages | default([]) }}"
+k3s_server_packages: "{{ extra_server_packages | default([]) }}"
+k3s_agent_packages: "{{ extra_agent_packages | default([]) }}"
 
 first_server: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
 api_endpoint: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else first_server }}"

@@ -30,8 +30,8 @@ def provision(vm, role, node_num)
       api_endpoint: "#{NETWORK_PREFIX}.100",
       token: "myvagrant",
       # Required to use the private network configured above
-      extra_server_args: "--node-external-ip #{node_ip} --flannel-iface eth1", 
-      extra_agent_args: "--node-external-ip #{node_ip} --flannel-iface eth1",
+      k3s_server_args: "--node-external-ip #{node_ip} --flannel-iface eth1", 
+      k3s_agent_args: "--node-external-ip #{node_ip} --flannel-iface eth1",
       # Optional, left as reference for ruby-ansible syntax
       # extra_service_envs: [ "NO_PROXY='localhost'" ],
       # config_yaml: <<~YAML

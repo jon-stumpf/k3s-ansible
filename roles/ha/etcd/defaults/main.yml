@@ -10,5 +10,5 @@ server_init_args: >-
     --server https://{{ first_server }}:{{ api_port }}
   {% endif %}
   --token {{ k3s_token }}
-  {{ extra_server_args | default('') }}
+  {{ k3s_server_args | default('') }}
 

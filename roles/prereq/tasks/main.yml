@@ -168,7 +168,7 @@
   ansible.builtin.fail:
     msg:
       - "Warning: Iptables {{ ansible_facts.packages['iptables'][0]['version'] }} found."
-      - "Add '--prefer-bundled-bin' to extra_server_args variable to use the bundled iptables binary."
+      - "Add '--prefer-bundled-bin' to k3s_server_args variable to use the bundled iptables binary."
   ignore_errors: true
 
 - name: Add {{ bin_dir }} to sudo secure_path
@@ -215,7 +215,7 @@
         src: "{{ item }}"
         dest: "{{ data_dir }}/server/manifests"
         mode: 0600
-      loop: "{{ extra_server_manifests }}"
+      loop: "{{ k3s_server_manifests }}"
       when: inventory_hostname in groups['server']
 
     - name: Copy agent manifests
@@ -223,7 +223,7 @@
         src: "{{ item }}"
         dest: "{{ data_dir }}/server/manifests"
         mode: 0600
-      loop: "{{ extra_agent_manifests }}"
+      loop: "{{ k3s_agent_manifests }}"
       when: inventory_hostname in groups['agent']
 
 
@@ -234,7 +234,7 @@
         name: "{{ item }}"
         state: present
         update_cache: true
-      with_items: "{{ extra_server_packages }}"
+      with_items: "{{ k3s_server_packages }}"
       when: inventory_hostname in groups['server']
 
     - name: Install agent packages
@@ -242,7 +242,7 @@
         name: "{{ item }}"
         state: present
         update_cache: true
-      with_items: "{{ extra_agent_packages }}"
+      with_items: "{{ k3s_agent_packages }}"
       when: inventory_hostname in groups['agent']
 
 - name: Setup optional config file

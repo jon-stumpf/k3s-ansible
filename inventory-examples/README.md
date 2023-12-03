@@ -79,18 +79,9 @@ service and environment files.  The default is `/etc/systemd/system`.
 This defaults to `/var/lib/rancher/k3s`.
 Note: this is not (yet) an option in *k3s-io/k3s*.
 
-### Variables for the *k3s* executable
-
-The install script from [https://get.k3s.io/](https://get.k3s.io/) has one flag (**INSTALL_K3S_EXEC**) to
-provide extra arguments to the *k3s* executable.  *k3s-ansible* uses two variables:
-one for servers and one for agents.  These are:
-
-- **install_server_args**: the default is `''`.
-- **install_agent_args**: the default is `''`.
-
 ### Install Flags not yet implemented
 
-The install flags that have yet to be implemented are:
+These install flags have yet to be implemented are:
 
 | Install Flag | What it does |
 | :--- | :--- |
@@ -107,26 +98,42 @@ Lastly, some install flags did not make sense to implement with *k3s-ansible*:
 
 | Install Flag | What *k3s-ansible* does |
 | :--- | :--- |
+| **INSTALL_K3S_EXEC**          | *Implemented using _extra_ variables (see below) |
 | **INSTALL_K3S_SKIP_DOWNLOAD** | *k3s-ansible* always downloads the *k3s* binary and its hash. |
 | **INSTALL_K3S_FORCE_RESTART** | *k3s-ansible* always restarts the service. |
 | **INSTALL_K3S_SKIP_ENABLE**   | *k3s-ansible* always enables the service. |
 | **INSTALL_K3S_SKIP_START**    | *k3s-ansible* always starts the service. |
 
-### k3s-ansible Install Flags
+### Extra Variables
+
+*k3s-ansible* provides additional functionality, exceeding the capabilities of *k3s-install.sh*.
+Each variable has a prefix of `extra_` and there are two per capability: one for servers and one for agents.
+
+### Variables for the *k3s* executable
+
+The install script from [https://get.k3s.io/](https://get.k3s.io/) has one flag (**INSTALL_K3S_EXEC**) to
+provide extra arguments to the *k3s* executable.  *k3s-ansible* uses two *extra* variables to provide this capability.
+one for servers and one for agents.  These are:
+
+- **extra_server_args**: the default is `''`.
+- **extra_agent_args**: the default is `''`.
 
 A list of additional manifests to install on to servers and agents.
 
-- **install_additional_server_manifests**: the default is `[]`.
-- **install_additional_agent_manifests**: the default is `[]`.
+- **extra_server_manifests**: the default is `[]`.
+- **extra_agent_manifests**: the default is `[]`.
 
 A list of additional packages to install on to servers and agents.
 
-- **install_additional_server_packages**: the default is `[]`.
-- **install_additional_agent_packages**: the default is `[]`.
+- **extra_server_packages**: the default is `[]`.
+- **extra_agent_packages**: the default is `[]`.
 
 Example:
 ```
-# Install longhorn required packages
-install_additional_packages:
+# Install longhorn-required packages
+extra_server_packages:
+  - nfs-common
+
+extra_agent_packages:
   - nfs-common
 ```

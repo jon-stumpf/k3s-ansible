@@ -25,4 +25,4 @@ Restart=always
 RestartSec=5s
 ExecStartPre=-/sbin/modprobe br_netfilter
 ExecStartPre=-/sbin/modprobe overlay
-ExecStart={{ bin_dir }}/k3s server --data-dir "{{ data_dir }}" {{ extra_server_args | default("") }}
+ExecStart={{ bin_dir }}/k3s server --data-dir "{{ data_dir }}" {{ k3s_server_args | default("") }}

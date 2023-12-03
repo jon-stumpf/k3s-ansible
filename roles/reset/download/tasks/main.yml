@@ -28,11 +28,23 @@
     state: absent
   when: remove_packages | bool
 
-- name: Remove additional packages
+- name: Remove additional server packages
   ansible.builtin.package:
     name: "{{ item }}"
     state: absent
-  with_items: "{{ install_additional_packages | default([]) }}"
+  with_items: "{{ extra_server_packages | default([]) }}"
+  when:
+    - inventory_hostname in groups['server']
+    - remove_packages | bool
+
+- name: Remove additional agent packages
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ extra_agent_packages | default([]) }}"
+  when:
+    - inventory_hostname in groups['agent']
+    - remove_packages | bool
 
 - name: Remove yum repo files
   ansible.builtin.file:
