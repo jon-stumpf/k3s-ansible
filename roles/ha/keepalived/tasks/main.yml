@@ -45,14 +45,14 @@
 # This is here for the case when someone changes the default
 - name: Verify keepalived run directory exists, {{ keepalived_run_dir }}
   register: run_dir
-  stat:
+  ansible.builtin.stat:
     path: "{{ keepalived_run_dir }}/."  # Use '/." to traverse a symlink, if necessary
   failed_when: not (run_dir.stat.isdir is defined and run_dir.stat.isdir)
 
 # This is here for the case when someone changes the default
 - name: Verify keepalived tmp directory exists, {{ keepalived_tmp_dir }}
   register: tmp_dir
-  stat:
+  ansible.builtin.stat:
     path: "{{ keepalived_tmp_dir }}/."  # Use '/." to traverse a symlink, if necessary
   failed_when: not (tmp_dir.stat.isdir is defined and tmp_dir.stat.isdir)
 
@@ -81,7 +81,7 @@
 - name: Check for the keepalived k3s script output file, {{ path }}"
   vars:
     path: "{{ keepalived_run_dir }}/{{ keepalived_script_output }}"
-  stat:
+  ansible.builtin.stat:
     path: "{{ path }}"
   register: output
 

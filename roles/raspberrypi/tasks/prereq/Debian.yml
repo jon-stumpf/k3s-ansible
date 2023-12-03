@@ -1,6 +1,6 @@
 ---
 - name: Check if /boot/firmware/cmdline.txt exists
-  stat:
+  ansible.builtin.stat:
     path: /boot/firmware/cmdline.txt
   register: cmdline_txt
 

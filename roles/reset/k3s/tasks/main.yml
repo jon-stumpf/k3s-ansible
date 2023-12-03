@@ -72,7 +72,7 @@
   block:
     - name: Stat command files
       register: stat_command_files
-      stat:
+      ansible.builtin.stat:
         path: "{{ bin_dir }}/{{ item }}"
       loop:
         - kubectl
