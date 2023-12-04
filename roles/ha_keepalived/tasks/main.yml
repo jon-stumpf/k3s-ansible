@@ -129,7 +129,7 @@
 
 - name: Start keepalived service
   register: started
-  service:
+  ansible.builtin.service:
     name: keepalived
     enabled: true
     state: started

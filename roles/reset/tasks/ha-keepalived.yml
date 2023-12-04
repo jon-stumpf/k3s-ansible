@@ -7,7 +7,7 @@
 # Stop the service
 
 - name: Stop keepalived service
-  service:
+  ansible.builtin.service:
     name: keepalived
     enabled: false
     state: stopped
