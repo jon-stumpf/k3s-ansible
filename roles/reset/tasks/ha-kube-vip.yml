@@ -36,7 +36,7 @@
 # Remove cluster VIP from interface
 # kube-vip does not do this for you.
 
-- name: Remove {{ kube_vip_address }}{{ kube_vip_subnet }} from {{ kube_vip_interface }}
+- name: Remove cluster VIP from {{ kube_vip_interface }}
   ansible.builtin.command: "ip address delete {{ kube_vip_address }}{{ kube_vip_subnet }} dev {{ kube_vip_interface }}"
   register: ipaddr_delete
   when: kube_vip_address in (ansible_all_ipv4_addresses | list)

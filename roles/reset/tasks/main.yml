@@ -101,7 +101,7 @@
     - "{{ bin_dir }}/k3s-killall.sh"    # From https://get.k3s.io
     - "{{ bin_dir }}/k3s-uninstall.sh"  # From https://get.k3s.io
 
-- name: Remove ~{{ ansible_user }}/.kube directory
+- name: Remove ~/.kube directory
   ansible.builtin.file:
     path: "~{{ ansible_user }}/.kube"
     state: absent

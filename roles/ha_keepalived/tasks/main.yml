@@ -78,7 +78,7 @@
     mode: "u=rwx,g=rx,o=rx"
 
 # You have to stat first because touch will ALWAYS change an existing file
-- name: Check for the keepalived k3s script output file, {{ path }}"
+- name: Check for the keepalived k3s script output file, {{ path }}
   vars:
     path: "{{ keepalived_run_dir }}/{{ keepalived_script_output }}"
   ansible.builtin.stat:
@@ -96,7 +96,7 @@
     mode: "u=rw,g=r,o=r"
   when: not output.stat.exists
 
-- name: Copy the kubeconfig, {{ keepalived_kubeconfig_src }}, to {{ path }}
+- name: Copy the keepalived kubeconfig to {{ path }}
   vars:
     path: "{{ keepalived_lib_dir }}/{{ keepalived_script_kubeconfig }}"
   ansible.builtin.copy:

@@ -2,7 +2,7 @@
 ################################################################################
 # Create {{ k3s_cluster_config }} on ansible controller
 #
-- name: Create {{ k3s_cluster_config }} on ansible controller
+- name: Create kubeconfig on ansible controller, {{ k3s_cluster_config }}
   when: not ansible_check_mode
   run_once: true
   block:
@@ -15,7 +15,7 @@
       register: tempfile
       changed_when: false
 
-    - name: Copy node kubeconfig to tempfile, {{ src }} to {{ dest }}
+    - name: Copy node kubeconfig to tempfile
       vars:
         src: "/etc/rancher/k3s/k3s.yaml"
         dest: "{{ tempfile.path }}"
@@ -26,14 +26,14 @@
         mode: "u=rw,g=,o="
       changed_when: false
 
-    - name: Replace https://localhost:{{ api_port }} with https://{{ api_endpoint }}:{{ api_port }}
+    - name: Replace localhost cluster endpoint with {{ api_endpoint }}
       ansible.builtin.command: >-
         {{ bin_dir }}/kubectl config set-cluster default
           --server=https://{{ api_endpoint }}:{{ api_port }}
           --kubeconfig {{ tempfile.path }}
       changed_when: false
 
-    - name: Fetch {{ src }} to {{ dest }}
+    - name: Fetch updated tempfile and place it at {{ dest }}
       vars:
         src: "{{ tempfile.path }}"
         dest: "{{ k3s_cluster_config }}"
@@ -53,7 +53,7 @@
 # Create ~{{ ansible_user }}/.kube/config on each host
 #
 
-- name: Setup ~{{ ansible_user }}/.kube/config
+- name: Create ~/.kube/config
   when: not ansible_check_mode
   block:
     - name: Create local kube directory, {{ path }}
@@ -65,7 +65,7 @@
         owner: "{{ ansible_user }}"
         mode: "u=rwx,g=rx,o="
 
-    - name: Copy {{ src }} to {{ dest }}
+    - name: Copy cluster config to {{ dest }}
       vars:
         src: "{{ k3s_cluster_config }}"
         dest: "~{{ ansible_user }}/.kube/config"
