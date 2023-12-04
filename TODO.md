@@ -80,8 +80,5 @@ Please, try it out.
 | ha_kube-vip           | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 3     | -     |
 | k3s_server            | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
 | k3s_agent             | install    | :heavy_check_mark: | :heavy_check_mark: |                    | -        | -     | -     |
-| reset/download        | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 1     | -     |
-| reset/ha/keepalived   | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *by reference*     | -        | -     | -     |
-| reset/ha/kube-vip     | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *by reference*     | 3        | 1     | -     |
-| reset/k3s             | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 9        | 1     | -     |
+| reset                 | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 11       | 3     | -     |
 

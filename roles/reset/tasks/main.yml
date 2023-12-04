@@ -10,11 +10,8 @@
 # Remove HA cluster method
 # Note: not from https://get.k3s.io
 
-- name: Include role, {{ role }}
-  vars:
-    role: "reset/ha_{{ k3s_cluster_method }}"
-  include_role:
-    name: "{{ role }}"
+- name: Remove HA cluster method, {{ k3s_cluster_method }}
+  ansible.builtin.include_tasks: "ha-{{ k3s_cluster_method }}.yml"
   when:
     - ha_enabled
     - k3s_cluster_method != 'external'
@@ -109,4 +106,9 @@
     path: "~{{ ansible_user }}/.kube"
     state: absent
   when: inventory_hostname in groups['server']
+
+###################################
+# Cleanup download equivalent tasks
+- name: Cleanup downloaded files
+  ansible.builtin.include_tasks: download.yml
 

@@ -4,6 +4,5 @@
   gather_facts: true
   become: true
   roles:
-    - role: reset/k3s
-    - role: reset/download
+    - role: reset
 
