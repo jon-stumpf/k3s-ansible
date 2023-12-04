@@ -90,6 +90,8 @@
     - cni0
     - flannel.1
     - flannel-v6.1
+  register: ip_link
+  changed_when: ip_link.rc == 0
 
 - name: Remove CNI files
   ansible.builtin.file:
@@ -121,4 +123,5 @@
     cmd: "iptables-restore"
     stdin: "{{ iptables_filtered }}"
   when: iptables_saved.stdout != iptables_filtered
+  changed_when: false
 

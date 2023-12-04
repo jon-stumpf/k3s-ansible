@@ -184,6 +184,7 @@
 - name: Wait for automatic system updates
   ansible.builtin.shell: while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 10; done;
   when: ansible_distribution in ['Ubuntu']
+  changed_when: false
 
 - name: Setup alternative K3s directory
   when: data_dir != default_data_dir

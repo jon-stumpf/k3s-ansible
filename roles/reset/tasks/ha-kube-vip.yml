@@ -21,6 +21,7 @@
       ansible.builtin.command: "{{ bin_dir }}/kubectl delete -R -f {{ path }}"
       run_once: true
       failed_when: false
+      changed_when: true
       when:
         - manifest_dir.stat.isdir is defined
         - manifest_dir.stat.isdir
@@ -39,6 +40,7 @@
   ansible.builtin.command: "ip address delete {{ kube_vip_address }}{{ kube_vip_subnet }} dev {{ kube_vip_interface }}"
   register: ipaddr_delete
   when: kube_vip_address in (ansible_all_ipv4_addresses | list)
+  changed_when: ipaddr_delete.rc != 0
   # TODO: Sometimes the address disappears before we get to it?
   failed_when: false
 

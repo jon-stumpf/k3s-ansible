@@ -8,4 +8,5 @@
   ansible.builtin.command: ./mkscr
   args:
     chdir: /boot
+  changed_when: true
   notify: Reboot Pi
