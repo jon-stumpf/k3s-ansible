@@ -42,7 +42,7 @@
         version_url: "{{ k3s_channel_url }}/{{ k3s_channel }}"
       block:
         - name: Output channel information
-          debug:
+          ansible.builtin.debug:
             var: version_url
           when: report_version_info
 
@@ -61,7 +61,7 @@
       when: k3s_version == 'undefined'
 
     - name: Output version
-      debug:
+      ansible.builtin.debug:
         var: k3s_version
       when: report_version_info
 
@@ -79,7 +79,7 @@
     - short_version is version('1.19.5', 'lt', True)
 
 - name: No check when k3s_commit is specified
-  debug:
+  ansible.builtin.debug:
     msg:
       - "There is no version check for HA support when a k3s_commit is specified."
       - "We assume you know what you are doing."

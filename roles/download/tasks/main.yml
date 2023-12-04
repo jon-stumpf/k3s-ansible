@@ -38,7 +38,7 @@
         version_url: "{{ k3s_channel_url }}/{{ k3s_channel }}"
       block:
         - name: Output channel information
-          debug:
+          ansible.builtin.debug:
             var: version_url
           when: report_download_urls
 
@@ -59,7 +59,7 @@
       check_mode: false
 
     - name: Output version
-      debug:
+      ansible.builtin.debug:
         var: k3s_version
       when: report_download_urls
       run_once: true
@@ -81,11 +81,11 @@
     - name: Report Download URLs
       block:
         - name: Report URL for binary
-          debug:
+          ansible.builtin.debug:
             var: binary_url
 
         - name: Report URL for hash
-          debug:
+          ansible.builtin.debug:
             var: hash_url
       when: report_download_urls
       check_mode: false
