@@ -47,7 +47,7 @@
           when: report_version_info
 
         - name: Get version from channel
-          uri:
+          ansible.builtin.uri:
             url: "{{ version_url }}"
             follow_redirects: safe
             force: true

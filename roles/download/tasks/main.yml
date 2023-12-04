@@ -43,7 +43,7 @@
           when: report_download_urls
 
         - name: Get version from channel
-          uri:
+          ansible.builtin.uri:
             url: "{{ version_url }}"
             follow_redirects: safe
             force: true
