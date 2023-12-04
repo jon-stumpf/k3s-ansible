@@ -36,8 +36,11 @@
     - k3s_cluster_method not in k3s_cluster_methods
 
 - name: Determine version to download
+  when: k3s_commit == 'undefined'
+  check_mode: false
   block:
     - name: Determine version from channel
+      when: k3s_version == 'undefined'
       vars:
         version_url: "{{ k3s_channel_url }}/{{ k3s_channel }}"
       block:
@@ -58,15 +61,10 @@
           ansible.builtin.set_fact:
             k3s_version: "{{ channel_version_info.url.split('/')[-1] }}"
 
-      when: k3s_version == 'undefined'
-
     - name: Output version
       ansible.builtin.debug:
         var: k3s_version
       when: report_version_info
-
-  when: k3s_commit == 'undefined'
-  check_mode: false
 
 - name: Check for minimum k3s version for HA configuration
   ansible.builtin.fail:

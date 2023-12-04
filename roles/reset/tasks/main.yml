@@ -66,6 +66,7 @@
 # done
 #
 - name: Remove command files if they are symlink'd
+  when: inventory_hostname in groups['server']
   block:
     - name: Stat command files
       register: stat_command_files
@@ -84,7 +85,6 @@
       loop: "{{ stat_command_files.results }}"
       loop_control:
         label: "{{ item.item }}"
-  when: inventory_hostname in groups['server']
 
 # Remove files and directories
 - name: Remove files and data

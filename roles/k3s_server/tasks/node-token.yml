@@ -4,6 +4,7 @@
 #
 
 - name: Setup node-token
+  when: not ansible_check_mode
   block:
     - name: Wait for node-token
       ansible.builtin.wait_for:
@@ -19,10 +20,8 @@
       ansible.builtin.set_fact:
         token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
 
-  when: not ansible_check_mode
-
 - name: Setup dummy node-token
+  when: ansible_check_mode
   ansible.builtin.set_fact:
     token: "ansible_check_mode token"
-  when: ansible_check_mode
 
