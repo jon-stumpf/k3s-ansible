@@ -7,21 +7,19 @@
   failed_when: false
 
 - name: Clean previous runs of k3s-init
+  # The ansible systemd module does not support reset-failed
   ansible.builtin.command: systemctl reset-failed k3s-init
   failed_when: false
   changed_when: false
-  args:
-    warn: false  # The ansible systemd module does not support reset-failed
 
 - name: Init cluster inside the transient k3s-init service
+  # The ansible systemd module does not support transient units
   ansible.builtin.command:
     cmd: "systemd-run -p RestartSec=2 \
                       -p Restart=on-failure \
                       --unit=k3s-init \
                       {{ bin_dir }}/k3s server {{ server_init_args }}"
     creates: "{{ systemd_dir }}/k3s.service"
-  args:
-    warn: false  # The ansible systemd module does not support transient units
 
 - name: Verification
   block:
