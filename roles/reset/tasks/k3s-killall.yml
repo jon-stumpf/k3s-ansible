@@ -60,8 +60,7 @@
   community.general.ip_netns:
     name: '{{ item }}'
     state: absent
-  loop: "{{ (ip_netns_show.stdout if ip_netns_show.stdout != '' else  '[ ]') | from_json | json_query('[*].name') }}"
-
+  loop: "{{ (ip_netns_show.stdout if ip_netns_show.stdout != '' else '[ ]') | from_json | json_query('[*].name') }}"
 #
 # Remove CNI interfaces
 # ip link show 2>/dev/null | grep 'master cni0'

@@ -39,7 +39,8 @@
   ansible.builtin.command: "ip address delete {{ kube_vip_address }}{{ kube_vip_subnet }} dev {{ kube_vip_interface }}"
   register: ipaddr_delete
   when: kube_vip_address in (ansible_all_ipv4_addresses | list)
-  failed_when: false # TODO: Sometimes the address disappears before we get to it?  Perhaps, kube-vip does delete this now.
+  # TODO: Sometimes the address disappears before we get to it?
+  failed_when: false
 
 ###############################################
 # Recommended in https://kube-vip.io/usage/k3s/
