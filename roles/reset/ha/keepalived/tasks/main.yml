@@ -1,7 +1,7 @@
 ---
 
 - name: Include vars
-  include_vars: "../roles/ha/keepalived/defaults/main.yml"
+  include_vars: "../roles/ha_keepalived/defaults/main.yml"
 
 ###################
 # Stop the service

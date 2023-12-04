@@ -6,7 +6,7 @@
 
 - name: Initialize k3s HA embedded database, etcd
   include_role:
-    name: "ha/etcd"
+    name: "ha_etcd"
   when: ha_enabled
 
 ################################################################################
@@ -43,7 +43,7 @@
 
 - name: Setup HA cluster method, {{ k3s_cluster_method | default('n/a') }}
   vars:
-    role: "ha/{{ k3s_cluster_method }}"
+    role: "ha_{{ k3s_cluster_method }}"
   include_role:
     name: "{{ role }}"
   when:

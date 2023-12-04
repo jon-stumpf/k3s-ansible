@@ -1,7 +1,7 @@
 ---
 
 - name: Include vars
-  include_vars: "../roles/ha/kube-vip/defaults/main.yml"
+  include_vars: "../roles/ha_kube-vip/defaults/main.yml"
 
 #################################################
 # Remove kube-vip

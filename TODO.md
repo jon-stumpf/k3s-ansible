@@ -75,9 +75,9 @@ Please, try it out.
 | prereq                | install    | :heavy_check_mark: | :heavy_check_mark: | **n/a**            | -        | -     | -     |
 | download              | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
 | raspberrypi           | install    | :heavy_check_mark: | :heavy_check_mark: | **n/a**            | 2        | 1     | -     |
-| ha/etcd               | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 3        | 1     | -     |
-| ha/keepalived         | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 1        | 1     | -     |
-| ha/kube-vip           | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 3     | -     |
+| ha_etcd               | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 3        | 1     | -     |
+| ha_keepalived         | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 1        | 1     | -     |
+| ha_kube-vip           | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 3     | -     |
 | k3s_server            | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
 | k3s_agent             | install    | :heavy_check_mark: | :heavy_check_mark: |                    | -        | -     | -     |
 | reset/download        | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 1     | -     |
