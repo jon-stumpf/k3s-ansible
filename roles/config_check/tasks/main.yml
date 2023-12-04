@@ -1,6 +1,6 @@
 ---
 - name: Check for correct single server configuration
-  fail:
+  ansible.builtin.fail:
     msg: "Single server configuration requires exactly one (1) server."
   when:
     - not ha_enabled
@@ -8,28 +8,28 @@
 
 # Purposefully do the HA check in two steps
 - name: Check for correct HA configuration (minimum)
-  fail:
+  ansible.builtin.fail:
     msg: "HA configuration requires an odd number of servers > 1 (i.e., minimum is three)."
   when:
     - ha_enabled
     - groups['server'] | length < 3
 
 - name: Check for correct HA configuration (odd number)
-  fail:
+  ansible.builtin.fail:
     msg: "HA configuration requires an ODD number of servers."
   when:
     - ha_enabled
     - groups['server'] | length is divisibleby 2
 
 - name: Check for a proper HA cluster virtual IP
-  fail:
+  ansible.builtin.fail:
     msg: "When HA is enabled, 'ha_cluster_vip' must have a valid IP address."
   when:
     - ha_enabled
     - (ha_cluster_vip is not defined) or not (ha_cluster_vip | ansible.netcommon.ipaddr)
 
 - name: Check for a proper HA cluster method
-  fail:
+  ansible.builtin.fail:
     msg: "'{{ k3s_cluster_method }}' is not a supported HA cluster method."
   when:
     - ha_enabled
@@ -69,7 +69,7 @@
   check_mode: false
 
 - name: Check for minimum k3s version for HA configuration
-  fail:
+  ansible.builtin.fail:
     msg: "HA configurations require k3s v1.19.5+k3s1 or greater.  {{ k3s_version }} was specified."
   vars:
     short_version: "{{ k3s_version | regex_search('v([^+]+)+', '\\1') | first }}"
