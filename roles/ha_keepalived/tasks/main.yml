@@ -4,7 +4,7 @@
 # Install the keepalived package
 
 - name: Install package keepalived
-  package:
+  ansible.builtin.package:
     name: keepalived
     state: "{{ keepalived_package_state }}"
   notify: restart-keepalived-service
@@ -13,7 +13,7 @@
 # Create the script user, if necessary
 
 - name: Create keepalived script user, {{ keepalived_script_user }}
-  user:
+  ansible.builtin.user:
     name: "{{ keepalived_script_user }}"
     group: "{{ keepalived_script_group }}"
     comment: "User to run keepalived scripts"

@@ -92,7 +92,7 @@
 
 # Download binaries
 - name: Download k3s binary
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ binary_url }}"
     checksum: "sha256:{{ hash_url }}"
     dest: "{{ bin_dir }}/k3s"

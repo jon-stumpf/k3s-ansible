@@ -5,7 +5,7 @@
 #
 
 - name: Initialize k3s HA embedded database, etcd
-  include_role:
+  ansible.builtin.include_role:
     name: "ha_etcd"
   when: ha_enabled
 
@@ -44,7 +44,7 @@
 - name: Setup HA cluster method, {{ k3s_cluster_method | default('n/a') }}
   vars:
     role: "ha_{{ k3s_cluster_method }}"
-  include_role:
+  ansible.builtin.include_role:
     name: "{{ role }}"
   when:
     - ha_enabled
@@ -55,7 +55,7 @@
 #
 
 - name: Wait for control plane at {{ api_endpoint }}:{{ api_port }}
-  wait_for:
+  ansible.builtin.wait_for:
     host: "{{ api_endpoint }}"
     port: "{{ api_port }}"
     timeout: 60

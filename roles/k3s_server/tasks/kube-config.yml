@@ -37,7 +37,7 @@
       vars:
         src: "{{ tempfile.path }}"
         dest: "{{ k3s_cluster_config }}"
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ src }}"
         dest: "{{ dest }}"
         flat: true

@@ -1,7 +1,7 @@
 ---
 
 - name: Include vars
-  include_vars: "../roles/ha_keepalived/defaults/main.yml"
+  ansible.builtin.include_vars: "../roles/ha_keepalived/defaults/main.yml"
 
 ###################
 # Stop the service
@@ -28,7 +28,7 @@
 #   - "{{ keepalived_lib_dir }}/{{ keepalived_script_kubeconfig }}"
 
 - name: Remove keepalived script user, {{ keepalived_script_user }}
-  user:
+  ansible.builtin.user:
     name: "{{ keepalived_script_user }}"
     state: absent
     remove: true
@@ -38,7 +38,7 @@
 # Uninstall the keepalived package
 
 - name: Uninstall package keepalived
-  package:
+  ansible.builtin.package:
     name: keepalived
     state: absent
   when: keepalived_package_remove | bool

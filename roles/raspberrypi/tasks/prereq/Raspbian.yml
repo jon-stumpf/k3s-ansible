@@ -8,7 +8,7 @@
   notify: Reboot Pi
 
 - name: Install iptables
-  apt:
+  ansible.builtin.apt:
     name: iptables
     state: present
 

@@ -6,11 +6,11 @@
 - name: Setup node-token
   block:
     - name: Wait for node-token
-      wait_for:
+      ansible.builtin.wait_for:
         path: "{{ data_dir }}/server/node-token"
 
     - name: Read node-token from the server
-      slurp:
+      ansible.builtin.slurp:
         path: "{{ data_dir }}/server/node-token"
       register: node_token
       become: true
