@@ -22,7 +22,7 @@
 #
 # killtree $({ set +x; } 2>/dev/null; getshims; set -x)
 #
-- name: pkill -9 -f "{{ data_dir }}/data/[^/]+/bin/containerd-shim"
+- name: Kill containerd shims
   register: pkill_containerd_shim
   ansible.builtin.command: pkill -9 -f "{{ data_dir }}/data/[^/]+/bin/containerd-shim"
   changed_when: "pkill_containerd_shim.rc == 0"

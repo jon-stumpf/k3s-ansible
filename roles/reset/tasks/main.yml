@@ -36,7 +36,7 @@
   failed_when: false
   loop: "{{ k3s_services }}"
 
-- name: daemon_reload
+- name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true
 
