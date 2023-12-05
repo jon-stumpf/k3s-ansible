@@ -1,5 +1,10 @@
 ---
 
+################################################
+# TODO: Handle the case where a server is added
+#       to the inventory after the cluster has
+#       already been setup from a previous run.
+
 - name: Clean previous runs of k3s-init
   ansible.builtin.systemd:
     name: k3s-init
