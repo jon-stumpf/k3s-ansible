@@ -66,19 +66,20 @@ Please, try it out.
 9. Document lesser switches to control behavior of roles (e.g., remove_packages)
 10. Create playbooks for other common operations beyond install/uninstall
 11. Create README.md files to document variables used by each HA method.
+12. Cleanup variables in playbook/group_vars/all.yml
 
 # Progress Report
 
 | Role                  | Role Type  | Idempotent         | Only Real Changes  | Defaults           | commands | TODOs | BUGs  |
 | :-------------------- | :--------: | :---:              | :---:              | :---:              | :---:    | :---: | :---: |
 | config-check          | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
-| prereq                | install    | :heavy_check_mark: | :heavy_check_mark: | **n/a**            | -        | -     | -     |
+| prereq                | install    | :heavy_check_mark: | :heavy_check_mark: | **n/a**            | 2        | -     | -     |
 | download              | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
-| raspberrypi           | install    | :heavy_check_mark: | :heavy_check_mark: | **n/a**            | 2        | 1     | -     |
-| ha_etcd               | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 3        | 1     | -     |
-| ha_keepalived         | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 1        | 1     | -     |
-| ha_kube-vip           | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 3     | -     |
-| k3s_server            | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | -     | -     |
+| raspberrypi           | install    | :heavy_check_mark: | :heavy_check_mark: | **n/a**            | 3        | -     | -     |
+| ha_etcd               | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 3        | 2     | -     |
+| ha_keepalived         | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | -        | 1     | -     |
+| ha_kube-vip           | HA-only    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 2        | 5     | -     |
+| k3s_server            | install    | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 1        | -     | -     |
 | k3s_agent             | install    | :heavy_check_mark: | :heavy_check_mark: |                    | -        | -     | -     |
-| reset                 | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 11       | 3     | -     |
+| reset                 | uninstall  | :heavy_check_mark: | :heavy_check_mark: | *under review*     | 9        | 4     | -     |
 
