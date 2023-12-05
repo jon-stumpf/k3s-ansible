@@ -59,4 +59,5 @@
     host: "{{ api_endpoint }}"
     port: "{{ api_port }}"
     timeout: 60
+  run_once: true
 
