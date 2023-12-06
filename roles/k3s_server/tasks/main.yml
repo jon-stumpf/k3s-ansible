@@ -54,7 +54,9 @@
 # Wait for control plane at {{ api_endpoint }}:{{ api_port }} before setting up agents
 #
 
-- name: Wait for control plane at {{ api_endpoint }}
+- name: Wait for control plane at {{ str }}
+  vars:
+    str: "{{ api_endpoint }}:{{ api_port }}"
   ansible.builtin.wait_for:
     host: "{{ api_endpoint }}"
     port: "{{ api_port }}"

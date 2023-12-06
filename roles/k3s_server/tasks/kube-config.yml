@@ -1,8 +1,9 @@
 ---
+
 ################################################################################
-# Create {{ k3s_cluster_config }} on ansible controller
+# Create {{ k3s_config_cluster }} on ansible controller
 #
-- name: Create kubeconfig on ansible controller, {{ k3s_cluster_config }}
+- name: Create kubeconfig on ansible controller, {{ k3s_config_cluster }}
   when: not ansible_check_mode
   run_once: true
   block:
@@ -15,10 +16,11 @@
       register: tempfile
       changed_when: false
 
-    - name: Copy node kubeconfig to tempfile
+    - name: Copy system kubeconfig, {{ str }}
       vars:
-        src: "/etc/rancher/k3s/k3s.yaml"
+        src: "{{ etc_dir }}/{{ k3s_config_system }}"
         dest: "{{ tempfile.path }}"
+        str: "{{ src }} --> {{ dest }}"
       ansible.builtin.copy:
         remote_src: true
         src: "{{ src }}"
@@ -26,17 +28,20 @@
         mode: "u=rw,g=,o="
       changed_when: false
 
-    - name: Replace localhost cluster endpoint with {{ api_endpoint }}
+    - name: Replace localhost cluster endpoint with {{ str }}
+      vars:
+        str: "{{ api_endpoint }}:{{ api_port }}"
       ansible.builtin.command: >-
         {{ bin_dir }}/kubectl config set-cluster default
           --server=https://{{ api_endpoint }}:{{ api_port }}
           --kubeconfig {{ tempfile.path }}
       changed_when: false
 
-    - name: Fetch updated tempfile and place it at {{ dest }}
+    - name: Fetch updated tempfile, {{ str }}
       vars:
         src: "{{ tempfile.path }}"
-        dest: "{{ k3s_cluster_config }}"
+        dest: "{{ k3s_config_cluster }}"  # placed in playbook/
+        str: "{{ src }} --> {{ dest }}"
       ansible.builtin.fetch:
         src: "{{ src }}"
         dest: "{{ dest }}"
@@ -48,30 +53,41 @@
         state: absent
       changed_when: false
 
-
-################################################################################
-# Create ~{{ ansible_user }}/.kube/config on each host
+#########################################
+# Create kubeconfig files on every server
 #
 
-- name: Create ~/.kube/config
+- name: Create kubeconfig files on every server
   when: not ansible_check_mode
   block:
-    - name: Create local kube directory, {{ path }}
+    - name: Create local kubeconfig directory, {{ path }}
       vars:
-        path: "~{{ ansible_user }}/.kube"
+        path: "~{{ ansible_user }}/{{ k3s_config_userdir }}"
       ansible.builtin.file:
         path: "{{ path }}"
         state: directory
         owner: "{{ ansible_user }}"
         mode: "u=rwx,g=rx,o="
 
-    - name: Copy cluster config to {{ dest }}
+    - name: Copy cluster config, {{ str }}
       vars:
-        src: "{{ k3s_cluster_config }}"
-        dest: "~{{ ansible_user }}/.kube/config"
+        src: "{{ k3s_config_cluster }}"
+        dest: "~{{ ansible_user }}/{{ k3s_config_userdir }}/{{ k3s_config_cluster }}"
+        str: "{{ src }} --> {{ dest }}"
       ansible.builtin.copy:
         src: "{{ src }}"
         dest: "{{ dest }}"
         owner: "{{ ansible_user }}"
         mode: "u=rw,g=,o="
 
+    - name: Copy localhost config, {{ str }}
+      vars:
+        src: "{{ etc_dir }}/{{ k3s_config_system }}"
+        dest: "~{{ ansible_user }}/{{ k3s_config_userdir }}/{{ k3s_config_local }}"
+        str: "{{ src }} --> {{ dest }}"
+      ansible.builtin.copy:
+        remote_src: true
+        src: "{{ src }}"
+        dest: "{{ dest }}"
+        owner: "{{ ansible_user }}"
+        mode: "u=rw,g=,o="

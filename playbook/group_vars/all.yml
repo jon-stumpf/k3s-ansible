@@ -18,6 +18,14 @@ default_channel: 'stable'
 default_systemd_dir: '/etc/systemd/system'
 default_bin_dir: '/usr/local/bin'
 default_data_dir: '/var/lib/rancher/k3s'
+default_etc_dir: '/etc/rancher/k3s'
+
+# These are always basenames, not path
+default_config_userdir: '.kube'  # The directory to be created in ~{{ ansible_user }}
+default_config_system: 'k3s.yaml'  # The name of the system config in {{ etc_dir }}
+default_config_local: 'config-local'  # The kubeconfig using localhost
+default_config_cluster: 'config-cluster'  # The kubeconfig using {{ api_endpoint }}
+default_config_playbook: 'cluster.conf'  # The kubeconfig installed on the ansible controller
 
 k3s_version: "{{ install_k3s_version | default('undefined') }}"
 k3s_commit: "{{ install_k3s_commit | default('undefined') }}"
@@ -29,6 +37,7 @@ systemd_dir: "{{ install_k3s_systemd_dir | default(default_systemd_dir) }}"
 bin_dir: "{{ install_k3s_bin_dir | default(default_bin_dir) }}"
 # NOTE: k3s-install.sh does not support changing the data directory
 data_dir: "{{ install_k3s_data_dir | default(default_data_dir) }}"
+etc_dir: "{{ install_k3s_etc_dir | default(default_etc_dir) }}"
 
 # These are used instead of INSTALL_K3S_EXEC
 k3s_server_args: "{{ extra_server_args | default('') }}"
@@ -44,7 +53,12 @@ first_server: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups
 api_endpoint: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else first_server }}"
 api_port: "{{ cluster_port | default('6443') }}"
 
-k3s_cluster_config: "{{ cluster_config | default('cluster.conf') }}"
+# k3s_config variables are always basenames, relative to the directories in which they are put
+k3s_config_userdir: "{{ kube_dir | default(default_config_userdir) | basename }}"
+k3s_config_system: "{{ system_config | default(default_config_system) | basename }}"
+k3s_config_local: "{{ local_config | default(default_config_local) | basename }}"
+k3s_config_cluster: "{{ cluster_config | default(default_config_cluster) | basename }}"
+
 k3s_cluster_method: "{{ ha_cluster_method | default('keepalived') }}"
 
 k3s_token: "{{ ha_k3s_token | default('MySuperSecureToken') }}"

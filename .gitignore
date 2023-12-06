@@ -2,3 +2,4 @@
 .vagrant
 inventory.yml
 playbook/debug.yml
+playbook/config-cluster
