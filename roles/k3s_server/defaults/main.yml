@@ -3,5 +3,7 @@
 ansible_user: debian
 ha_enabled: false
 
-k3s_config_cluster: cluster.conf
+k3s:
+  config:
+    cluster: cluster.conf
 

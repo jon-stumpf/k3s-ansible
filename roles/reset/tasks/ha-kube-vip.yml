@@ -1,7 +1,7 @@
 ---
 
 - name: Include vars
-  ansible.builtin.include_vars: "../roles/{{ k3s_cluster_role[k3s_cluster_method] }}/defaults/main.yml"
+  ansible.builtin.include_vars: "../roles/{{ reference.cluster.roles[k3s.cluster.method] }}/defaults/main.yml"
 
 #################################################
 # Remove kube-vip
@@ -9,7 +9,7 @@
 
 - name: Remove kube-vip resource and files
   vars:
-    path: "{{ data_dir }}/server/manifests/{{ k3s_cluster_method }}"
+    path: "{{ k3s.dir.data }}/server/manifests/{{ k3s.cluster.method }}"
   block:
     - name: Check for the manifest directory, {{ path }}
       register: manifest_dir
@@ -18,7 +18,7 @@
 
     - name: Remove kube-vip resources found in {{ path }}
       register: resources
-      ansible.builtin.command: "{{ bin_dir }}/kubectl delete -R -f {{ path }}"
+      ansible.builtin.command: "{{ k3s.dir.bin }}/kubectl delete -R -f {{ path }}"
       run_once: true
       failed_when: false
       changed_when: true

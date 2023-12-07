@@ -4,7 +4,7 @@
   register: k3s_agent_service
   ansible.builtin.template:
     src: "k3s-agent.service.j2"
-    dest: "{{ systemd_dir }}/k3s-agent.service"
+    dest: "{{ k3s.dir.systemd }}/k3s-agent.service"
     owner: root
     group: root
     mode: "u=rw,g=r,o=r"

@@ -23,14 +23,14 @@
     cmd: "systemd-run -p RestartSec=2 \
                       -p Restart=on-failure \
                       --unit=k3s-init \
-                      {{ bin_dir }}/k3s server {{ server_init_args }}"
-    creates: "{{ systemd_dir }}/k3s.service"
+                      {{ k3s.dir.bin }}/k3s server {{ server_init_args }}"
+    creates: "{{ k3s.dir.systemd }}/k3s.service"
 
 - name: Verification
   block:
     - name: Verify that all nodes actually joined (check k3s-init.service if this fails)
       ansible.builtin.command:
-        cmd: "{{ bin_dir }}/k3s kubectl get nodes \
+        cmd: "{{ k3s.dir.bin }}/k3s kubectl get nodes \
                                         -l 'node-role.kubernetes.io/master=true' \
                                         -o=jsonpath='{.items[*].metadata.name}'"
       when: not ansible_check_mode

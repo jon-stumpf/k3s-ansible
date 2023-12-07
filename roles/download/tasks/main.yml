@@ -33,12 +33,19 @@
 # Determine URLs to download
 - name: Determine URLs to download
   block:
+    - name: Use version specified by k3s.version.tag
+      when: k3s.version.tag != 'undefined'
+      run_once: true
+      check_mode: false
+      ansible.builtin.set_fact:
+        download_version: "{{ k3s.version.tag }}"
+
     - name: Determine version from channel
-      when: k3s_version == 'undefined'
+      when: k3s.version.tag == 'undefined'
       run_once: true
       check_mode: false
       vars:
-        version_url: "{{ k3s_channel_url }}/{{ k3s_channel }}"
+        version_url: "{{ k3s.channel.url }}/{{ k3s.channel.tag }}"
       block:
         - name: Output channel information
           ansible.builtin.debug:
@@ -55,26 +62,26 @@
 
         - name: Set version from channel
           ansible.builtin.set_fact:
-            k3s_version: "{{ channel_version_info.url.split('/')[-1] }}"
+            download_version: "{{ channel_version_info.url.split('/')[-1] }}"
 
     - name: Output version
       ansible.builtin.debug:
-        var: k3s_version
+        var: download_version
       when: report_download_urls
       run_once: true
 
     - name: Determine GitHub URLs
       ansible.builtin.set_fact:
-        binary_url: "{{ github_url }}/download/{{ k3s_version }}/k3s{{ k3s_suffix }}"
-        hash_url: "{{ github_url }}/download/{{ k3s_version }}/sha256sum-{{ k3s_arch }}.txt"
-      when: k3s_commit == 'undefined'
+        binary_url: "{{ github_url }}/download/{{ download_version }}/k3s{{ k3s_suffix }}"
+        hash_url: "{{ github_url }}/download/{{ download_version }}/sha256sum-{{ k3s_arch }}.txt"
+      when: k3s.version.commit == 'undefined'
       check_mode: false
 
     - name: Determine Storage URLs
       ansible.builtin.set_fact:
-        binary_url: "{{ storage_url }}/k3s{{ k3s_suffix }}-{{ k3s_commit }}"
-        hash_url: "{{ storage_url }}/k3s{{ k3s_suffix }}-{{ k3s_commit }}.sha256sum"
-      when: k3s_commit != 'undefined'
+        binary_url: "{{ storage_url }}/k3s{{ k3s_suffix }}-{{ k3s.version.commit }}"
+        hash_url: "{{ storage_url }}/k3s{{ k3s_suffix }}-{{ k3s.version.commit }}.sha256sum"
+      when: k3s.version.commit != 'undefined'
       check_mode: false
 
     - name: Report Download URLs
@@ -94,7 +101,7 @@
   ansible.builtin.get_url:
     url: "{{ binary_url }}"
     checksum: "sha256:{{ hash_url }}"
-    dest: "{{ bin_dir }}/k3s"
+    dest: "{{ k3s.dir.bin }}/k3s"
     owner: root
     group: root
     mode: "u=rwx,g=rx,o=rx"

@@ -17,14 +17,14 @@
     state: stopped
     enabled: false
   failed_when: false
-  loop: "{{ k3s_services }}"
+  loop: "{{ reference.service.names }}"
 
 #
 # killtree $({ set +x; } 2>/dev/null; getshims; set -x)
 #
 - name: Kill containerd shims
   register: pkill_containerd_shim
-  ansible.builtin.command: pkill -9 -f "{{ data_dir }}/data/[^/]+/bin/containerd-shim"
+  ansible.builtin.command: pkill -9 -f "{{ k3s.dir.data }}/data/[^/]+/bin/containerd-shim"
   changed_when: "pkill_containerd_shim.rc == 0"
   failed_when: false
 
@@ -36,7 +36,7 @@
   ansible.builtin.include_tasks: umount_with_children.yml
   loop:
     - /run/k3s
-    - "{{ data_dir }}"
+    - "{{ k3s.dir.data }}"
     - /var/lib/kubelet/pods
     - /var/lib/kubelet/plugins
     - /run/netns/cni-

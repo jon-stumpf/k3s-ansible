@@ -45,7 +45,7 @@
         - ufw_status['stdout'] == "Status':' active"
       community.general.ufw:
         rule: allow
-        port: "{{ api_port }}"
+        port: "{{ k3s.cluster.port }}"
         proto: tcp
 
     - name: If ufw enabled, open etcd ports
@@ -74,7 +74,7 @@
   block:
     - name: If firewalld enabled, open api port
       ansible.posix.firewalld:
-        port: "{{ api_port }}/tcp"
+        port: "{{ k3s.cluster.port }}/tcp"
         zone: trusted
         state: enabled
         permanent: true
@@ -168,12 +168,12 @@
   ansible.builtin.fail:
     msg:
       - "Warning: Iptables {{ ansible_facts.packages['iptables'][0]['version'] }} found."
-      - "Add '--prefer-bundled-bin' to k3s_server_args variable to use the bundled iptables binary."
+      - "Add '--prefer-bundled-bin' to k3s.args.server variable to use the bundled iptables binary."
   ignore_errors: true
 
-- name: Add bin directory to sudo secure_path, {{ bin_dir }}
+- name: Add bin directory to sudo secure_path, {{ k3s.dir.bin }}
   ansible.builtin.lineinfile:
-    line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:{{ bin_dir }}'
+    line: 'Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:{{ k3s.dir.bin }}'
     regexp: "Defaults(\\s)*secure_path(\\s)*="
     state: present
     insertafter: EOF
@@ -187,18 +187,18 @@
   changed_when: false
 
 - name: Setup alternative K3s directory
-  when: data_dir != default_data_dir
+  when: k3s.dir.data != defaults.dir.data
   block:
     - name: Make parent of default data directory
       ansible.builtin.file:
-        path: "{{ default_data_dir | dirname }}"
+        path: "{{ defaults.dir.data | dirname }}"
         mode: 0755
         state: directory
 
     - name: Create symlink to default data directory
       ansible.builtin.file:
-        src: "{{ data_dir }}"
-        dest: "{{ default_data_dir }}"
+        src: "{{ k3s.dir.data }}"
+        dest: "{{ defaults.dir.data }}"
         follow: false
         force: true
         state: link
@@ -207,24 +207,24 @@
   block:
     - name: Make manifests directory
       ansible.builtin.file:
-        path: "{{ data_dir }}/server/manifests"
+        path: "{{ k3s.dir.data }}/server/manifests"
         mode: 0700
         state: directory
 
     - name: Copy server manifests
       ansible.builtin.copy:
         src: "{{ item }}"
-        dest: "{{ data_dir }}/server/manifests"
+        dest: "{{ k3s.dir.data }}/server/manifests"
         mode: 0600
-      loop: "{{ k3s_server_manifests }}"
+      loop: "{{ k3s.manifests.server }}"
       when: inventory_hostname in groups['server']
 
     - name: Copy agent manifests
       ansible.builtin.copy:
         src: "{{ item }}"
-        dest: "{{ data_dir }}/server/manifests"
+        dest: "{{ k3s.dir.data }}/server/manifests"
         mode: 0600
-      loop: "{{ k3s_agent_manifests }}"
+      loop: "{{ k3s.manifests.agent }}"
       when: inventory_hostname in groups['agent']
 
 
@@ -235,7 +235,7 @@
         name: "{{ item }}"
         state: present
         update_cache: true
-      with_items: "{{ k3s_server_packages }}"
+      with_items: "{{ k3s.packages.server }}"
       when: inventory_hostname in groups['server']
 
     - name: Install agent packages
@@ -243,7 +243,7 @@
         name: "{{ item }}"
         state: present
         update_cache: true
-      with_items: "{{ k3s_agent_packages }}"
+      with_items: "{{ k3s.packages.agent }}"
       when: inventory_hostname in groups['agent']
 
 - name: Setup optional config file

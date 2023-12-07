@@ -8,14 +8,14 @@
 
 - name: Remove downloaded k3s binary
   ansible.builtin.file:
-    path: "{{ bin_dir }}/k3s"
+    path: "{{ k3s.dir.bin }}/k3s"
     state: absent
   when: remove_packages | bool
 
 - name: Remove link to alternative K3s directory
-  when: data_dir != default_data_dir
+  when: k3s.dir.data != defaults.dir.data
   ansible.builtin.file:
-    path: "{{ default_data_dir }}"
+    path: "{{ defaults.dir.data }}"
     state: absent
 
 #

@@ -30,19 +30,25 @@
 
 - name: Check for a proper HA cluster method
   ansible.builtin.fail:
-    msg: "'{{ k3s_cluster_method }}' is not a supported HA cluster method."
+    msg: "'{{ k3s.cluster.method }}' is not a supported HA cluster method."
   when:
     - ha_enabled
-    - k3s_cluster_method not in k3s_cluster_methods
+    - k3s.cluster.method not in reference.cluster.methods
 
 - name: Determine version to download
-  when: k3s_commit == 'undefined'
+  when: k3s.version.commit == 'undefined'
   check_mode: false
   block:
+    - name: Use version specified by k3s.version.tag
+      when: k3s.version.tag != 'undefined'
+      run_once: true
+      ansible.builtin.set_fact:
+        download_version: "{{ k3s.version.tag }}"
+
     - name: Determine version from channel
-      when: k3s_version == 'undefined'
+      when: k3s.version.tag == 'undefined'
       vars:
-        version_url: "{{ k3s_channel_url }}/{{ k3s_channel }}"
+        version_url: "{{ k3s.channel.url }}/{{ k3s.channel.tag }}"
       block:
         - name: Output channel information
           ansible.builtin.debug:
@@ -59,30 +65,30 @@
 
         - name: Set version from channel
           ansible.builtin.set_fact:
-            k3s_version: "{{ channel_version_info.url.split('/')[-1] }}"
+            download_version: "{{ channel_version_info.url.split('/')[-1] }}"
 
     - name: Output version
       ansible.builtin.debug:
-        var: k3s_version
+        var: download_version
       when: report_version_info
 
 - name: Check for minimum k3s version for HA configuration
   ansible.builtin.fail:
-    msg: "HA configurations require k3s v1.19.5+k3s1 or greater.  {{ k3s_version }} was specified."
+    msg: "HA configurations require k3s v1.19.5+k3s1 or greater.  {{ download_version }} was specified."
   vars:
-    short_version: "{{ k3s_version | regex_search('v([^+]+)+', '\\1') | first }}"
+    short_version: "{{ download_version | regex_search('v([^+]+)+', '\\1') | first }}"
   when:
-    - k3s_commit == 'undefined'
+    - k3s.version.commit == 'undefined'
     - ha_enabled
     - short_version is version('1.19.5', 'lt', True)
 
-- name: No check when k3s_commit is specified
+- name: No check when k3s.version.commit is specified
   ansible.builtin.debug:
     msg:
-      - "There is no version check for HA support when a k3s_commit is specified."
+      - "There is no version check for HA support when a k3s.version.commit is specified."
       - "We assume you know what you are doing."
   when:
-    - k3s_commit != 'undefined'
+    - k3s.version.commit != 'undefined'
     - ha_enabled
     - report_version_info
 

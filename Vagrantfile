@@ -26,12 +26,12 @@ def provision(vm, role, node_num)
       "k3s_cluster:children" => ["server", "agent"],
     }
     ansible.extra_vars = {
-      k3s_version: "v1.26.9+k3s1",
-      api_endpoint: "#{NETWORK_PREFIX}.100",
+      k3s.version.tag: "v1.26.9+k3s1",
+      k3s.cluster.address: "#{NETWORK_PREFIX}.100",
       token: "myvagrant",
       # Required to use the private network configured above
-      k3s_server_args: "--node-external-ip #{node_ip} --flannel-iface eth1", 
-      k3s_agent_args: "--node-external-ip #{node_ip} --flannel-iface eth1",
+      k3s.args.server: "--node-external-ip #{node_ip} --flannel-iface eth1", 
+      k3s.args.agent: "--node-external-ip #{node_ip} --flannel-iface eth1",
       # Optional, left as reference for ruby-ansible syntax
       # extra_service_envs: [ "NO_PROXY='localhost'" ],
       # config_yaml: <<~YAML

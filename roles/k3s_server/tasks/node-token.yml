@@ -8,11 +8,11 @@
   block:
     - name: Wait for node-token
       ansible.builtin.wait_for:
-        path: "{{ data_dir }}/server/node-token"
+        path: "{{ k3s.dir.data }}/server/node-token"
 
     - name: Read node-token from the server
       ansible.builtin.slurp:
-        path: "{{ data_dir }}/server/node-token"
+        path: "{{ k3s.dir.data }}/server/node-token"
       register: node_token
       become: true
 

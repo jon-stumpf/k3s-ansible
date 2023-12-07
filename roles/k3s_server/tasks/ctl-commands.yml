@@ -7,23 +7,23 @@
   register: k3s_symlink
   ansible.builtin.template:
     src: "k3s.sh.j2"
-    dest: "{{ bin_dir }}/k3s.sh"
+    dest: "{{ k3s.dir.bin }}/k3s.sh"
     owner: root
     group: root
     mode: "u=rwx,g=rx,o=rx"
   when:
-    - data_dir != default_data_dir
+    - k3s.dir.data != defaults.dir.data
     - not ansible_check_mode
 
 - name: Determine k3s bin target
   ansible.builtin.set_fact:
     # yamllint disable-line rule:line-length
-    k3s_bin_target: "{{ '{{ bin_dir }}/k3s.sh' if data_dir != default_data_dir else '{{ bin_dir }}/k3s' | default('{{ bin_dir }}/k3s') }}"
+    k3s_bin_target: "{{ '{{ k3s.dir.bin }}/k3s.sh' if k3s.dir.data != defaults.dir.data else '{{ k3s.dir.bin }}/k3s' | default('{{ k3s.dir.bin }}/k3s') }}"
 
 - name: Create symlink'd commands (kubectl, crictl, ctr)
   ansible.builtin.file:
     src: "{{ k3s_bin_target }}"
-    dest: "{{ bin_dir }}/{{ item }}"
+    dest: "{{ k3s.dir.bin }}/{{ item }}"
     state: link
   with_items:
     - kubectl

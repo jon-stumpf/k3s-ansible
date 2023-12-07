@@ -7,7 +7,7 @@ export KUBECONFIG="{{ keepalived_lib_dir }}/{{ keepalived_script_kubeconfig }}"
 
 trap 'rm -f "${TMP_FILE}"' EXIT
 
-{{ bin_dir }}/k3s kubectl get --raw='/livez?verbose' 1> "${TMP_FILE}"
+{{ k3s.dir.bin }}/k3s kubectl get --raw='/livez?verbose' 1> "${TMP_FILE}"
 
 if [ "${?}" != 0 ]
 then

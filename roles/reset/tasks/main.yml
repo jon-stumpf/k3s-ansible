@@ -10,11 +10,11 @@
 # Remove HA cluster method
 # Note: not from https://get.k3s.io
 
-- name: Remove HA cluster method, {{ k3s_cluster_method }}
-  ansible.builtin.include_tasks: "ha-{{ k3s_cluster_method }}.yml"
+- name: Remove HA cluster method, {{ k3s.cluster.method }}
+  ansible.builtin.include_tasks: "ha-{{ k3s.cluster.method }}.yml"
   when:
     - ha_enabled
-    - k3s_cluster_method != 'external'
+    - k3s.cluster.method != 'external'
     - inventory_hostname in groups['server']
 
 #
@@ -34,7 +34,7 @@
     state: stopped
     enabled: false
   failed_when: false
-  loop: "{{ k3s_services }}"
+  loop: "{{ reference.service.names }}"
 
 - name: Reload systemd
   ansible.builtin.systemd:
@@ -46,9 +46,9 @@
 #
 - name: Remove service files
   ansible.builtin.file:
-    path: "{{ systemd_dir }}/{{ item }}"
+    path: "{{ k3s.dir.systemd }}/{{ item }}"
     state: absent
-  loop: "{{ k3s_services | product(k3s_service_file_extensions) | map('join', '.') }}"
+  loop: "{{ reference.service.names | product(reference.service.extensions) | map('join', '.') }}"
 
 #
 # if (ls /etc/systemd/system/k3s*.service || ls /etc/init.d/k3s*) >/dev/null 2>&1; then
@@ -56,12 +56,12 @@
 #    exit
 # fi
 #
-# Should this be done rather than focusing on a discrete list of services (k3s_services)?
+# Should this be done rather than focusing on a discrete list of services (reference.service.names)?
 
 #
 # for cmd in kubectl crictl ctr; do
-#    if [ -L {{ bin_dir }}/$cmd ]; then
-#        rm -f {{ bin_dir }}/$cmd
+#    if [ -L {{ k3s.dir.bin }}/$cmd ]; then
+#        rm -f {{ k3s.dir.bin }}/$cmd
 #    fi
 # done
 #
@@ -71,7 +71,7 @@
     - name: Stat command files
       register: stat_command_files
       ansible.builtin.stat:
-        path: "{{ bin_dir }}/{{ item }}"
+        path: "{{ k3s.dir.bin }}/{{ item }}"
       loop:
         - kubectl
         - crictl
@@ -95,11 +95,11 @@
     - /etc/rancher/k3s
     - /run/k3s
     - /run/flannel
-    - "{{ data_dir }}"
+    - "{{ k3s.dir.data }}"
     - /var/lib/kubelet
-    - "{{ bin_dir }}/k3s.sh"
-    - "{{ bin_dir }}/k3s-killall.sh"    # From https://get.k3s.io
-    - "{{ bin_dir }}/k3s-uninstall.sh"  # From https://get.k3s.io
+    - "{{ k3s.dir.bin }}/k3s.sh"
+    - "{{ k3s.dir.bin }}/k3s-killall.sh"    # From https://get.k3s.io
+    - "{{ k3s.dir.bin }}/k3s-uninstall.sh"  # From https://get.k3s.io
 
 - name: Remove ~/.kube directory
   ansible.builtin.file:

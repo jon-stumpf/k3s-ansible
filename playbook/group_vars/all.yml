@@ -2,8 +2,6 @@
 # These variables are not meant to be changed.
 # All changes should happen in "inventory.yml".
 #
-# TODO: clean up these variables -- perhaps, with dictionaries.
-#
 # install_* variables match INSTALL_* variables in k3s-install.sh.
 # extra_* variables are used to supplement arguments to the k3s executable,
 # provide additional manifests, and/or have additional packages installed.
@@ -11,76 +9,92 @@
 # install_* and extra_* variables should be set in "inventory.yml".
 #
 
+######################################################################
+# k3s-ansible default values
 # Added so that we can check when the default is not being used
-default_channel_url: 'https://update.k3s.io/v1-release/channels'
-default_channel: 'stable'
+#
+defaults:
+  channel:
+    tag: 'stable'
+    url: 'https://update.k3s.io/v1-release/channels'
+  dir:
+    systemd: '/etc/systemd/system'
+    bin: '/usr/local/bin'
+    data: '/var/lib/rancher/k3s'
+    etc: '/etc/rancher/k3s'
+  config:  # There are always basenames, never paths
+    userdir: '.kube'  # The directory to be created in ~{{ ansible_user }}
+    system: 'k3s.yaml'  # The name of the system config in {{ k3s.dir.etc }}
+    local: 'config-local'  # The kubeconfig using localhost
+    cluster: 'config-cluster'  # The kubeconfig using {{ k3s.cluster.address }}
+  cluster:
+    first: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+    method: 'keepalived'
+    token: 'MySuperSecureToken'
+    port: '6443'
 
-default_systemd_dir: '/etc/systemd/system'
-default_bin_dir: '/usr/local/bin'
-default_data_dir: '/var/lib/rancher/k3s'
-default_etc_dir: '/etc/rancher/k3s'
+######################################################################
+# k3s-ansible reference values
+#
+reference:
+  service:  # systemd unit information
+    names:
+      - 'k3s'
+      - 'k3s-agent'
+    extensions:
+      - 'service'
+      - 'service.env'
+  cluster:
+    methods:
+      - 'external'
+      - 'kube-vip'
+      - 'keepalived'
+    roles:
+      external: ''
+      kube-vip: 'ha_kube_vip'
+      keepalived: 'ha_keepalived'
 
-# These are always basenames, not path
-default_config_userdir: '.kube'  # The directory to be created in ~{{ ansible_user }}
-default_config_system: 'k3s.yaml'  # The name of the system config in {{ etc_dir }}
-default_config_local: 'config-local'  # The kubeconfig using localhost
-default_config_cluster: 'config-cluster'  # The kubeconfig using {{ api_endpoint }}
-default_config_playbook: 'cluster.conf'  # The kubeconfig installed on the ansible controller
+######################################################################
+# k3s-ansible configuration variables
+#
+k3s:
+  version:
+    tag: "{{ install_k3s_version | default('undefined') }}"
+    commit: "{{ install_k3s_commit | default('undefined') }}"
 
-k3s_version: "{{ install_k3s_version | default('undefined') }}"
-k3s_commit: "{{ install_k3s_commit | default('undefined') }}"
+  channel:
+    tag: "{{ install_k3s_channel | default(defaults.channel.tag) }}"
+    url: "{{ install_k3s_channel_url | default(defaults.channel.url) }}"
 
-k3s_channel_url: "{{ install_k3s_channel_url | default(default_channel_url) }}"
-k3s_channel: "{{ install_k3s_channel | default(default_channel) }}"
+  dir:
+    systemd: "{{ install_k3s_systemd_dir | default(defaults.dir.systemd) }}"
+    bin: "{{ install_k3s_bin_dir | default(defaults.dir.bin) }}"
+    # NOTE: k3s-install.sh does not support changing the data/ or etc/ directories
+    data: "{{ install_k3s_data_dir | default(defaults.dir.data) }}"
+    etc: "{{ install_k3s_etc_dir | default(defaults.dir.etc) }}"
 
-systemd_dir: "{{ install_k3s_systemd_dir | default(default_systemd_dir) }}"
-bin_dir: "{{ install_k3s_bin_dir | default(default_bin_dir) }}"
-# NOTE: k3s-install.sh does not support changing the data directory
-data_dir: "{{ install_k3s_data_dir | default(default_data_dir) }}"
-etc_dir: "{{ install_k3s_etc_dir | default(default_etc_dir) }}"
+  args:
+    # These are used instead of INSTALL_K3S_EXEC
+    server: "{{ extra_server_args | default('') }}"
+    agent: "{{ extra_agent_args | default('') }}"
 
-# These are used instead of INSTALL_K3S_EXEC
-k3s_server_args: "{{ extra_server_args | default('') }}"
-k3s_agent_args: "{{ extra_agent_args | default('') }}"
+  manifests:
+    server: "{{ extra_server_manifests | default([]) }}"
+    agent: "{{ extra_agent_manifests | default([]) }}"
 
-k3s_server_manifests: "{{ extra_server_manifests | default([]) }}"
-k3s_agent_manifests: "{{ extra_agent_manifests | default([]) }}"
+  packages:
+    server: "{{ extra_server_packages | default([]) }}"
+    agent: "{{ extra_agent_packages | default([]) }}"
 
-k3s_server_packages: "{{ extra_server_packages | default([]) }}"
-k3s_agent_packages: "{{ extra_agent_packages | default([]) }}"
+  config:
+    # k3s_config variables are always basenames, relative to the directories in which they are put
+    userdir: "{{ kube_dir | default(defaults.config.userdir) | basename }}"
+    system: "{{ system_config | default(defaults.config.system) | basename }}"
+    local: "{{ local_config | default(defaults.config.local) | basename }}"
+    cluster: "{{ cluster_config | default(defaults.config.cluster) | basename }}"
 
-first_server: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
-api_endpoint: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else first_server }}"
-api_port: "{{ cluster_port | default('6443') }}"
-
-# k3s_config variables are always basenames, relative to the directories in which they are put
-k3s_config_userdir: "{{ kube_dir | default(default_config_userdir) | basename }}"
-k3s_config_system: "{{ system_config | default(default_config_system) | basename }}"
-k3s_config_local: "{{ local_config | default(default_config_local) | basename }}"
-k3s_config_cluster: "{{ cluster_config | default(default_config_cluster) | basename }}"
-
-k3s_cluster_method: "{{ ha_cluster_method | default('keepalived') }}"
-
-k3s_token: "{{ ha_k3s_token | default('MySuperSecureToken') }}"
-
-# Services information
-k3s_services:
-  - k3s
-  - k3s-agent
-
-k3s_service_file_extensions:
-  - service
-  - service.env
-
-# Supported HA Cluster Methods
-k3s_cluster_methods:
-  - external
-  - kube-vip
-  - keepalived
-
-# The associated role for an HA Cluster Method
-k3s_cluster_role:
-  external: ''
-  kube-vip: ha_kube_vip
-  keepalived: ha_keepalived
-
+  cluster:
+    method: "{{ ha_cluster_method | default(defaults.cluster.method) }}"
+    token: "{{ ha_k3s_token | default(defaults.cluster.token) }}"
+    address: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else defaults.cluster.first }}"
+    port: "{{ cluster_port | default(defaults.cluster.port) }}"

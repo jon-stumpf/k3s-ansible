@@ -17,7 +17,7 @@
   register: k3s_service
   ansible.builtin.template:
     src: "k3s-server.service.j2"
-    dest: "{{ systemd_dir }}/k3s.service"
+    dest: "{{ k3s.dir.systemd }}/k3s.service"
     owner: root
     group: root
     mode: "u=rw,g=r,o=r"
@@ -41,25 +41,25 @@
 ##########################
 # Set up HA cluster method
 
-- name: Setup HA cluster method, {{ k3s_cluster_method | default('n/a') }}
+- name: Setup HA cluster method, {{ k3s.cluster.method | default('n/a') }}
   vars:
-    role: "{{ k3s_cluster_role[k3s_cluster_method] }}"
+    role: "{{ reference.cluster.roles[k3s.cluster.method] }}"
   ansible.builtin.include_role:
     name: "{{ role }}"
   when:
     - ha_enabled
-    - k3s_cluster_method != 'external'
+    - k3s.cluster.method != 'external'
 
-######################################################################################
-# Wait for control plane at {{ api_endpoint }}:{{ api_port }} before setting up agents
+#######################################################################
+# Wait for control plane before setting up agents
 #
 
 - name: Wait for control plane at {{ str }}
   vars:
-    str: "{{ api_endpoint }}:{{ api_port }}"
+    str: "{{ k3s.cluster.address }}:{{ k3s.cluster.port }}"
   ansible.builtin.wait_for:
-    host: "{{ api_endpoint }}"
-    port: "{{ api_port }}"
+    host: "{{ k3s.cluster.address }}"
+    port: "{{ k3s.cluster.port }}"
     timeout: 60
   run_once: true
 

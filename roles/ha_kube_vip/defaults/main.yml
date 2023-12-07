@@ -17,8 +17,8 @@ kube_vip_namespace: 'kube-system'
 
 kube_vip_interface: "{{ ansible_default_ipv4.interface }}"
 
-kube_vip_port: '{{ api_port }}'
-kube_vip_port_lb: '{{ api_port }}'
+kube_vip_port: '{{ k3s.cluster.port }}'
+kube_vip_port_lb: '{{ k3s.cluster.port }}'
 
 kube_vip_enable_lb: true
 kube_vip_enable_labeling: true

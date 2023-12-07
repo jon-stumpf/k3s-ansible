@@ -43,30 +43,30 @@ Please, try it out.
 
 # TODO
 
-1. Make all roles *idempotent* and not report changes when none, in fact, are needed or material.
-2. Add *keepalived* label to servers when using keepalived;  Add the following annotations:
+- [x] Make all roles *idempotent* and not report changes when none, in fact, are needed or material.
+- [ ] Add *keepalived* label to servers when using keepalived;  Add the following annotations:
     - `keepalived/vrrp_instance=<name>`
     - `keepalived/master=[true|false]`
     - `keepalived/version=<version>`
     - `keepalived/vip=<ipaddr>/<cidr>`
-3. Add the ability to download the latest version of *kube-vip*
+- [ ] Add the ability to download the latest version of *kube-vip*
     - Currently, uses a static version (v0.4.0) that can be manually changed
-4. Make sure all roles have defaults defined
-5. Make HA not require `k3s_token` to be defined
+- [ ] Make sure all roles have defaults defined
+- [ ] Make HA not require `k3s.cluster.token` to be defined
     - i.e., use the `node-token` from the first server
-6. Replace `command` and `shell` tasks with *ansible* equivalents (where appropriate)
+- [ ] Replace `command` and `shell` tasks with *ansible* equivalents (where appropriate)
     - `ip`
     - `kubectl`
     - etc.
-7. Is the `raspberrypi` role a NO-OP?
+- [ ] Is the `raspberrypi` role a NO-OP?
     - It does not appear to execute any tasks that induce change
     - Should it be deleted?
-8. From where does *k3s-selinux* get installed?
+- [ ] From where does *k3s-selinux* get installed?
     - The `reset/download` role deletes it.
-9. Document lesser switches to control behavior of roles (e.g., remove_packages)
-10. Create playbooks for other common operations beyond install/uninstall
-11. Create README.md files to document variables used by each HA method.
-12. Cleanup variables in playbook/group_vars/all.yml
+- [ ] Document lesser switches to control behavior of roles (e.g., remove_packages)
+- [ ] Create playbooks for other common operations beyond install/uninstall
+- [ ] Create README.md files to document variables used by each HA method.
+- [x] Cleanup variables in playbook/group_vars/all.yml
 
 # Progress Report
 

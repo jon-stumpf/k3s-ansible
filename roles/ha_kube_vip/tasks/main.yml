@@ -25,7 +25,7 @@
   block:
     - name: Create manifest directory {{ path }}
       vars:
-        path: "{{ data_dir }}/server/manifests/{{ k3s_cluster_method }}"
+        path: "{{ k3s.dir.data }}/server/manifests/{{ k3s.cluster.method }}"
       ansible.builtin.file:
         path: "{{ path }}"
         state: directory
@@ -55,6 +55,6 @@
         mode: "u=rw,g=,o="
 
     - name: Apply kube-vip manifests
-      ansible.builtin.command: "{{ bin_dir }}/k3s kubectl apply -R -f {{ manifest_dir.path }}"
+      ansible.builtin.command: "{{ k3s.dir.bin }}/k3s kubectl apply -R -f {{ manifest_dir.path }}"
       when: manifest_dir is defined
       changed_when: false

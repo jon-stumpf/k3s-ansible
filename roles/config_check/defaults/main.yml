@@ -2,10 +2,12 @@
 
 ha_enabled: false
 
-k3s_channel_url: 'https://update.k3s.io/v1-release/channels'
-k3s_channel: 'stable'
-k3s_version: 'undefined'
-k3s_commit: 'undefined'
+# k3s:
+#  channel:
+#    tag: 'stable'
+#    url: 'https://update.k3s.io/v1-release/channels'
+#    version: 'undefined'
+#    commit: 'undefined'
 
 report_version_info: false
 

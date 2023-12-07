@@ -1,9 +1,9 @@
 ---
 
 ################################################################################
-# Create {{ k3s_config_cluster }} on ansible controller
+# Create {{ k3s.config.cluster }} on ansible controller
 #
-- name: Create kubeconfig on ansible controller, {{ k3s_config_cluster }}
+- name: Create kubeconfig on ansible controller, {{ k3s.config.cluster }}
   when: not ansible_check_mode
   run_once: true
   block:
@@ -18,7 +18,7 @@
 
     - name: Copy system kubeconfig, {{ str }}
       vars:
-        src: "{{ etc_dir }}/{{ k3s_config_system }}"
+        src: "{{ k3s.dir.etc }}/{{ k3s.config.system }}"
         dest: "{{ tempfile.path }}"
         str: "{{ src }} --> {{ dest }}"
       ansible.builtin.copy:
@@ -30,17 +30,17 @@
 
     - name: Replace localhost cluster endpoint with {{ str }}
       vars:
-        str: "{{ api_endpoint }}:{{ api_port }}"
+        str: "{{ k3s.cluster.address }}:{{ k3s.cluster.port }}"
       ansible.builtin.command: >-
-        {{ bin_dir }}/kubectl config set-cluster default
-          --server=https://{{ api_endpoint }}:{{ api_port }}
+        {{ k3s.dir.bin }}/kubectl config set-cluster default
+          --server=https://{{ k3s.cluster.address }}:{{ k3s.cluster.port }}
           --kubeconfig {{ tempfile.path }}
       changed_when: false
 
     - name: Fetch updated tempfile, {{ str }}
       vars:
         src: "{{ tempfile.path }}"
-        dest: "{{ k3s_config_cluster }}"  # placed in playbook/
+        dest: "{{ k3s.config.cluster }}"  # placed in playbook/
         str: "{{ src }} --> {{ dest }}"
       ansible.builtin.fetch:
         src: "{{ src }}"
@@ -62,7 +62,7 @@
   block:
     - name: Create local kubeconfig directory, {{ path }}
       vars:
-        path: "~{{ ansible_user }}/{{ k3s_config_userdir }}"
+        path: "~{{ ansible_user }}/{{ k3s.config.userdir }}"
       ansible.builtin.file:
         path: "{{ path }}"
         state: directory
@@ -71,8 +71,8 @@
 
     - name: Copy cluster config, {{ str }}
       vars:
-        src: "{{ k3s_config_cluster }}"
-        dest: "~{{ ansible_user }}/{{ k3s_config_userdir }}/{{ k3s_config_cluster }}"
+        src: "{{ k3s.config.cluster }}"
+        dest: "~{{ ansible_user }}/{{ k3s.config.userdir }}/{{ k3s.config.cluster }}"
         str: "{{ src }} --> {{ dest }}"
       ansible.builtin.copy:
         src: "{{ src }}"
@@ -82,8 +82,8 @@
 
     - name: Copy localhost config, {{ str }}
       vars:
-        src: "{{ etc_dir }}/{{ k3s_config_system }}"
-        dest: "~{{ ansible_user }}/{{ k3s_config_userdir }}/{{ k3s_config_local }}"
+        src: "{{ k3s.dir.etc }}/{{ k3s.config.system }}"
+        dest: "~{{ ansible_user }}/{{ k3s.config.userdir }}/{{ k3s.config.local }}"
         str: "{{ src }} --> {{ dest }}"
       ansible.builtin.copy:
         remote_src: true
