@@ -6,19 +6,19 @@
 - name: Install package keepalived
   ansible.builtin.package:
     name: keepalived
-    state: "{{ keepalived_package_state }}"
+    state: "{{ keepalived.package.state }}"
   notify: restart-keepalived-service
 
 ######################################
 # Create the script user, if necessary
 
-- name: Create keepalived script user, {{ keepalived_script_user }}
+- name: Create keepalived script user, {{ keepalived.script.user }}
   ansible.builtin.user:
-    name: "{{ keepalived_script_user }}"
-    group: "{{ keepalived_script_group }}"
+    name: "{{ keepalived.script.user }}"
+    group: "{{ keepalived.script.group }}"
     comment: "User to run keepalived scripts"
-    home: "{{ keepalived_lib_dir }}"
-    shell: "{{ keepalived_script_login }}"
+    home: "{{ keepalived.dir.lib }}"
+    shell: "{{ keepalived.script.login }}"
     append: false
     create_home: false
     system: true
@@ -26,39 +26,39 @@
 ##################################
 # Install/Update the configuration
 
-- name: Create keepalived etc directory, {{ keepalived_etc_dir }}
+- name: Create keepalived etc directory, {{ keepalived.dir.etc }}
   ansible.builtin.file:
-    path: "{{ keepalived_etc_dir }}"
+    path: "{{ keepalived.dir.etc }}"
     state: directory
     owner: root
     group: root
     mode: "u=rwx,g=,o="
 
-- name: Create keepalived lib directory, {{ keepalived_lib_dir }}
+- name: Create keepalived lib directory, {{ keepalived.dir.lib }}
   ansible.builtin.file:
-    path: "{{ keepalived_lib_dir }}"
+    path: "{{ keepalived.dir.lib }}"
     state: directory
-    owner: "{{ keepalived_script_user }}"
-    group: "{{ keepalived_script_group }}"
+    owner: "{{ keepalived.script.user }}"
+    group: "{{ keepalived.script.group }}"
     mode: "u=rwx,g=,o="
 
 # This is here for the case when someone changes the default
-- name: Verify keepalived run directory exists, {{ keepalived_run_dir }}
+- name: Verify keepalived run directory exists, {{ keepalived.dir.run }}
   register: check_rundir
   ansible.builtin.stat:
-    path: "{{ keepalived_run_dir }}/."  # Use '/." to traverse a symlink, if necessary
+    path: "{{ keepalived.dir.run }}/."  # Use '/." to traverse a symlink, if necessary
   failed_when: not (check_rundir.stat.isdir is defined and check_rundir.stat.isdir)
 
 # This is here for the case when someone changes the default
-- name: Verify keepalived tmp directory exists, {{ keepalived_tmp_dir }}
+- name: Verify keepalived tmp directory exists, {{ keepalived.dir.tmp }}
   register: check_tmpdir
   ansible.builtin.stat:
-    path: "{{ keepalived_tmp_dir }}/."  # Use '/." to traverse a symlink, if necessary
+    path: "{{ keepalived.dir.tmp }}/."  # Use '/." to traverse a symlink, if necessary
   failed_when: not (check_tmpdir.stat.isdir is defined and check_tmpdir.stat.isdir)
 
 - name: Create keepalived configuration, {{ path }}
   vars:
-    path: "{{ keepalived_etc_dir }}/{{ keepalived_config_file }}"
+    path: "{{ keepalived.dir.etc }}/{{ keepalived.config.file }}"
   ansible.builtin.template:
     src: "keepalived.conf.j2"
     dest: "{{ path }}"
@@ -69,42 +69,45 @@
 
 - name: Create keepalived k3s check script, {{ path }}
   vars:
-    path: "{{ keepalived_lib_dir }}/{{ keepalived_script_name }}"
+    path: "{{ keepalived.dir.lib }}/{{ keepalived.script.name }}"
   ansible.builtin.template:
     src: "keepalived_check_k3s.sh.j2"
     dest: "{{ path }}"
-    owner: "{{ keepalived_script_user }}"
-    group: "{{ keepalived_script_group }}"
+    owner: "{{ keepalived.script.user }}"
+    group: "{{ keepalived.script.group }}"
     mode: "u=rwx,g=rx,o=rx"
 
 # You have to stat first because touch will ALWAYS change an existing file
 - name: Check for the keepalived k3s script output file, {{ path }}
   vars:
-    path: "{{ keepalived_run_dir }}/{{ keepalived_script_output }}"
+    path: "{{ keepalived.dir.run }}/{{ keepalived.script.output }}"
   ansible.builtin.stat:
     path: "{{ path }}"
   register: check_output
 
+# We have to create the output file so that the script has permissions
 - name: Create keepalived k3s script output file, {{ path }}
   vars:
-    path: "{{ keepalived_run_dir }}/{{ keepalived_script_output }}"
+    path: "{{ keepalived.dir.run }}/{{ keepalived.script.output }}"
   ansible.builtin.file:
     path: "{{ path }}"
     state: touch
-    owner: "{{ keepalived_script_user }}"
-    group: "{{ keepalived_script_group }}"
+    owner: "{{ keepalived.script.user }}"
+    group: "{{ keepalived.script.group }}"
     mode: "u=rw,g=r,o=r"
   when: not check_output.stat.exists
 
-- name: Copy the keepalived kubeconfig to {{ path }}
+- name: Copy the keepalived kubeconfig, {{ str }}
   vars:
-    path: "{{ keepalived_lib_dir }}/{{ keepalived_script_kubeconfig }}"
+    src: "{{ keepalived.config.k3s }}"
+    dest: "{{ keepalived.dir.lib }}/{{ keepalived.script.kubeconfig }}"
+    str: "{{ src }} --> {{ dest }}"
   ansible.builtin.copy:
     remote_src: true
-    src: "{{ keepalived_kubeconfig_src }}"
-    dest: "{{ path }}"
-    owner: "{{ keepalived_script_user }}"
-    group: "{{ keepalived_script_group }}"
+    src: "{{ src }}"
+    dest: "{{ dest }}"
+    owner: "{{ keepalived.script.user }}"
+    group: "{{ keepalived.script.group }}"
     mode: "u=r,g=,o="
 
 #####################################

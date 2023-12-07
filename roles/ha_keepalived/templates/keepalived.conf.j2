@@ -1,30 +1,36 @@
 
-vrrp_script k3s_check {
-	script "{{ keepalived_lib_dir }}/{{ keepalived_script_name }}"
-	user {{ keepalived_script_user }}
-	interval {{ keepalived_check_interval }}
-	timeout {{ keepalived_check_timeout }}
-	rise {{ keepalived_check_rise }}
-	fall {{ keepalived_check_fall }}
+use_pid_dir
+
+global_defs {
+        enable_script_security
+	script_user {{ keepalived.script.user }}
 }
 
-vrrp_instance {{ keepalived_instance_name }} {
+vrrp_script k3s_check {
+	script "{{ keepalived.dir.lib }}/{{ keepalived.script.name }}"
+	interval {{ keepalived.check.interval }}
+	timeout {{ keepalived.check.timeout }}
+	rise {{ keepalived.check.rise }}
+	fall {{ keepalived.check.fall }}
+}
+
+vrrp_instance {{ keepalived.option.instance_name }} {
 {% if ansible_host == defaults.cluster.first %}
 	state MASTER
-	priority {{ keepalived_master_priority }}
+	priority {{ keepalived.option.priority.master }}
 {% else %}
 	state BACKUP
-	priority {{ keepalived_backup_priority }}
+	priority {{ keepalived.option.priority.backup }}
 {% endif %}
-	interface {{ keepalived_interface }}
-	virtual_router_id {{ keepalived_vr_id }}
-	advert_int {{ keepalived_advertisement_interval }}
+	interface {{ keepalived.option.interface }}
+	virtual_router_id {{ keepalived.option.vr_id }}
+	advert_int {{ keepalived.option.advertisement_interval }}
 	authentication {
 		auth_type PASS
-		auth_pass {{ keepalived_password }}
+		auth_pass {{ keepalived.option.password }}
 	}
 	virtual_ipaddress {
-		{{ ha_cluster_vip }}/{{ keepalived_network_mask }}
+		{{ ha_cluster_vip }}/{{ keepalived.option.network_mask }}
 	}
 	track_script {
 		k3s_check

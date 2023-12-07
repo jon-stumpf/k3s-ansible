@@ -20,16 +20,16 @@
     path: "{{ item }}"
     state: absent
   loop:
-    - "{{ keepalived_etc_dir }}"
-    - "{{ keepalived_lib_dir }}"
-    - "{{ keepalived_run_dir }}/{{ keepalived_script_output }}"
-#   - "{{ keepalived_etc_dir }}/{{ keepalived_config_file }}"
-#   - "{{ keepalived_lib_dir }}/{{ keepalived_script_name }}"
-#   - "{{ keepalived_lib_dir }}/{{ keepalived_script_kubeconfig }}"
+    - "{{ keepalived.dir.etc }}"
+    - "{{ keepalived.dir.lib }}"
+    - "{{ keepalived.dir.tmp }}/{{ keepalived.script.output }}"
+#   - "{{ keepalived.dir.etc }}/{{ keepalived.config.file }}"
+#   - "{{ keepalived.dir.lib }}/{{ keepalived.script.name }}"
+#   - "{{ keepalived.dir.lib }}/{{ keepalived.script.kubeconfig }}"
 
-- name: Remove keepalived script user, {{ keepalived_script_user }}
+- name: Remove keepalived script user, {{ keepalived.script.user }}
   ansible.builtin.user:
-    name: "{{ keepalived_script_user }}"
+    name: "{{ keepalived.script.user }}"
     state: absent
     remove: true
     force: true
@@ -41,5 +41,5 @@
   ansible.builtin.package:
     name: keepalived
     state: absent
-  when: keepalived_package_remove | bool
+  when: keepalived.package.remove | bool
 

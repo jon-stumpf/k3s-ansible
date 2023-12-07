@@ -1,9 +1,9 @@
 #!/bin/bash
 
-OUTPUT_FILE="{{ keepalived_run_dir }}/{{ keepalived_script_output }}"
-TMP_FILE="{{ keepalived_tmp_dir }}/{{ keepalived_script_output }}-${$}"
+OUTPUT_FILE="{{ keepalived.dir.run }}/{{ keepalived.script.output }}"
+TMP_FILE="{{ keepalived.dir.tmp }}/{{ keepalived.script.output }}"
 
-export KUBECONFIG="{{ keepalived_lib_dir }}/{{ keepalived_script_kubeconfig }}"
+export KUBECONFIG="{{ keepalived.dir.lib }}/{{ keepalived.script.kubeconfig }}"
 
 trap 'rm -f "${TMP_FILE}"' EXIT
 
