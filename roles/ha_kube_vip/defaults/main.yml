@@ -10,7 +10,7 @@
 kube_vip_version: 'v0.6.3'
 
 kube_vip_address: "{{ ha_cluster_vip | default('127.0.0.1') }}"
-kube_vip_subnet: "{{ ha_cluster_subnet_mask | default('/24') }}"
+kube_vip_subnet: "{{ ha_cluster_subnet_mask | default('24') }}"
 
 # These are less commonly changed values for kube-vip.
 kube_vip_namespace: 'kube-system'

@@ -53,7 +53,7 @@ spec:
         - name: vip_cidr
           value: "32"
         - name: vip_subnet
-          value: "{{ kube_vip_subnet }}"
+          value: "/{{ kube_vip_subnet }}"
         - name: cp_enable
           value: "true"
         - name: cp_namespace
