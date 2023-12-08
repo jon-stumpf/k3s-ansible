@@ -7,20 +7,28 @@
   ansible.builtin.package:
     name: keepalived
     state: "{{ keepalived.package.state }}"
-  notify: restart-keepalived-service
+
+######################################
+# Create the script group, if necessary
+
+- name: Create keepalived script group, {{ keepalived.script.group }}
+  ansible.builtin.group:
+    name: "{{ keepalived.script.group }}"
+    state: present
 
 ######################################
 # Create the script user, if necessary
 
 - name: Create keepalived script user, {{ keepalived.script.user }}
+  when: keepalived.script.user != 'root'
   ansible.builtin.user:
     name: "{{ keepalived.script.user }}"
     group: "{{ keepalived.script.group }}"
     comment: "User to run keepalived scripts"
-    home: "{{ keepalived.dir.lib }}"
+    home: "{{ keepalived.dir.run }}"
     shell: "{{ keepalived.script.login }}"
     append: false
-    create_home: false
+    create_home: true
     system: true
 
 ##################################
@@ -34,27 +42,17 @@
     group: root
     mode: "u=rwx,g=,o="
 
-- name: Create keepalived lib directory, {{ keepalived.dir.lib }}
+- name: Create other keepalived directories
   ansible.builtin.file:
-    path: "{{ keepalived.dir.lib }}"
+    path: "{{ item }}"
     state: directory
     owner: "{{ keepalived.script.user }}"
     group: "{{ keepalived.script.group }}"
     mode: "u=rwx,g=,o="
-
-# This is here for the case when someone changes the default
-- name: Verify keepalived run directory exists, {{ keepalived.dir.run }}
-  register: check_rundir
-  ansible.builtin.stat:
-    path: "{{ keepalived.dir.run }}/."  # Use '/." to traverse a symlink, if necessary
-  failed_when: not (check_rundir.stat.isdir is defined and check_rundir.stat.isdir)
-
-# This is here for the case when someone changes the default
-- name: Verify keepalived tmp directory exists, {{ keepalived.dir.tmp }}
-  register: check_tmpdir
-  ansible.builtin.stat:
-    path: "{{ keepalived.dir.tmp }}/."  # Use '/." to traverse a symlink, if necessary
-  failed_when: not (check_tmpdir.stat.isdir is defined and check_tmpdir.stat.isdir)
+  loop:
+    - "{{ keepalived.dir.lib }}"
+    - "{{ keepalived.dir.run }}"
+    - "{{ keepalived.dir.tmp }}"
 
 - name: Create keepalived configuration, {{ path }}
   vars:
@@ -65,7 +63,6 @@
     owner: root
     group: root
     mode: "u=r,g=,o="
-  notify: restart-keepalived-service
 
 - name: Create keepalived k3s check script, {{ path }}
   vars:

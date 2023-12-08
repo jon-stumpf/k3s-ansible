@@ -5,11 +5,11 @@
 # These variables are used only when HA is enabled and the method chosen is keepalived.
 
 keepalived:
-  dir:
+  dir:  # These directories will be removed on reset, so don't use existing directories.
     etc: '/etc/keepalived'
     lib: '/var/lib/keepalived'
     run: '/var/run/keepalived'
-    tmp: '/var/tmp'
+    tmp: '/var/tmp/keepalived'
 
   config:
     k3s: '{{ k3s.dir.etc }}/{{ k3s.config.system }}'
@@ -19,16 +19,17 @@ keepalived:
     name: 'keepalived_check_k3s.sh'
     output: 'k3s_check.out'
     kubeconfig: 'kubeconfig'
-    user: 'keepalived'
-    group: 'nogroup'
-    login: '/usr/sbin/nologin'
+    # The user/group will be removed on reset, so don't use existing user/group.
+    user: 'keepalived_script'
+    group: 'keepalived_script'
+    login: '/bin/bash'
 
   package:
     state: 'latest'
     remove: "{{ remove_packages | default(true) | bool }}"
 
   check:
-    interval: 2
+    interval: 60  # Don't make this too low or servers will slow down or lock up
     timeout: 5
     rise: 3
     fall: 3

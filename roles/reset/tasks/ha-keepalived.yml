@@ -15,24 +15,27 @@
 ##################################
 # Delete the configuration
 
-- name: Delete the keepalived configuration
+- name: Delete the keepalived directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:
     - "{{ keepalived.dir.etc }}"
     - "{{ keepalived.dir.lib }}"
-    - "{{ keepalived.dir.tmp }}/{{ keepalived.script.output }}"
-#   - "{{ keepalived.dir.etc }}/{{ keepalived.config.file }}"
-#   - "{{ keepalived.dir.lib }}/{{ keepalived.script.name }}"
-#   - "{{ keepalived.dir.lib }}/{{ keepalived.script.kubeconfig }}"
+    - "{{ keepalived.dir.run }}"
+    - "{{ keepalived.dir.tmp }}"
 
 - name: Remove keepalived script user, {{ keepalived.script.user }}
+  when: keepalived.script.user != "root"  # I learned the hard way. :-|
   ansible.builtin.user:
     name: "{{ keepalived.script.user }}"
     state: absent
-    remove: true
-    force: true
+
+- name: Remove keepalived script group, {{ keepalived.script.group }}
+  when: keepalived.script.group != "root"
+  ansible.builtin.group:
+    name: "{{ keepalived.script.group }}"
+    state: absent
 
 ##################################
 # Uninstall the keepalived package

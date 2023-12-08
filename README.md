@@ -15,7 +15,7 @@ those hosts.  That's it!
 No need to futz with lots of settings and variables (unless you like that sort of thing;
 then, have at it).
 
-**NOTE: HA, any method, is broken at the moment.**
+**NOTE: HA method kube-vip is broken at the moment.**
 
 And, to setup an HA cluster, you need one more IP address - not of a host,
 but for your cluster virtual IP address.

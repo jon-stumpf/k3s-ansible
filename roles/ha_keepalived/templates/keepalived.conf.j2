@@ -2,8 +2,10 @@
 use_pid_dir
 
 global_defs {
-        enable_script_security
-	script_user {{ keepalived.script.user }}
+# TODO: be able to run the track script as a non-root user!
+#	enable_script_security
+#	script_user {{ keepalived.script.user }}
+        script_user root  # Not cool, keepalived
 }
 
 vrrp_script k3s_check {
