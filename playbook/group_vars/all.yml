@@ -32,6 +32,10 @@ defaults:
     method: 'keepalived'
     token: 'MySuperSecureToken'
     port: '6443'
+  memory:
+    high: '1G'
+    max: '2G'
+    swapmax: '1G'
 
 ######################################################################
 # k3s-ansible reference values
@@ -98,3 +102,8 @@ k3s:
     token: "{{ ha_k3s_token | default(defaults.cluster.token) }}"
     address: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else defaults.cluster.first }}"
     port: "{{ cluster_port | default(defaults.cluster.port) }}"
+
+  memory:
+    high: "{{ service_memory_high | default(defaults.memory.high) }}"
+    max: "{{ service_memory_max | default(defaults.memory.max) }}"
+    swapmax: "{{ service_memory_swapmax | default(defaults.memory.swapmax) }}"
