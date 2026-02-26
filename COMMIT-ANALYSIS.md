@@ -151,3 +151,138 @@ Cleaned up and restructured configuration variables:
 | 10 | `feat: kubeconfig saved to localhost` | Kubeconfig management |
 | 11 | `fix: idempotency and control flow` | site.yml, wait, state changes |
 | 12 | `feat: k3s service memory variables` | Memory vars |
+
+---
+
+## Rebase Strategy
+
+### Why `git rebase k3s-io/main` won't work
+
+The fork diverged in **November 2021**. Since then:
+- **160 upstream commits** have landed on `k3s-io/main`
+- **213 commits** exist in the fork
+- Upstream made structural changes that overlap the fork's work: renamed roles, reorganized
+  playbooks, added `airgap` and `k3s_upgrade` roles, moved to `playbooks/` (plural), changed
+  `inventory-sample.yml` format
+
+A straight `git rebase` would produce hundreds of conflicts and is not viable.
+
+---
+
+### Recommended Approach: New Branch Per PR
+
+Create a fresh branch from `k3s-io/main` for each logical PR, manually applying only the unique
+changes from the fork. This is clean, reviewable, and avoids conflict noise.
+
+```bash
+git fetch k3s-io
+git checkout -b pr/01-description k3s-io/main
+# apply changes, commit
+git push jss pr/01-description
+```
+
+---
+
+### What Upstream Already Has (skip or adapt)
+
+| Fork Change | Upstream Status |
+|---|---|
+| `server`/`agent` host group names | Already in upstream |
+| `ansible.builtin.*` FQCN | Already in upstream |
+| Truthy `true`/`false` values | Already in upstream |
+| `reboot.yml`, `reset.yml`, `site.yml` | Already in upstream (under `playbooks/`) |
+| `.ansible-lint`, `Vagrantfile`, `collections/` | Already in upstream |
+| IPv6 forwarding conditional | Already in upstream |
+| `api_endpoint` variable name | Already in upstream |
+| `k3s_server` / `k3s_agent` role names | Already in upstream |
+
+---
+
+### What the Fork Uniquely Contributes (the actual PRs)
+
+Work through these in order — earlier ones are less likely to conflict with later ones:
+
+#### PR 1 — `fix: idempotency and control flow`
+**Low conflict risk.** Upstream's `site.yml`/roles are structurally similar.
+- Wait for control plane before agents
+- Prevent unnecessary state changes
+- Only reload k3s service when files change
+- Register variable naming to avoid conflicts
+
+#### PR 2 — `feat: reset role`
+**No conflict** — upstream has no `roles/reset/` at all; only a bare `playbooks/reset.yml`.
+- Full `k3s-uninstall.sh`-equivalent reset role
+- `remove_packages` option
+- Killall task file
+- VIP interface cleanup hooks
+
+#### PR 3 — `feat: kubeconfig saved to localhost`
+**Low conflict risk.** Upstream's `k3s_server` role handles kubeconfig but doesn't save to localhost.
+- Save kubeconfig as `playbook/cluster.conf`
+- Save both `localhost` and `api_endpoint` variants
+
+#### PR 4 — `feat: k3s service memory variables`
+**Low conflict risk.** Additive to `k3s_server` defaults.
+- Memory-related service variables
+
+#### PR 5 — `feat: config validation role`
+**Low conflict risk** — upstream has no `roles/config_check`.
+- Required variable validation
+- HA-specific checks
+- Empty `group_vars/all.yml` guard
+
+#### PR 6 — `feat: HA cluster methods (kube-vip, keepalived, etcd)`
+**Medium conflict risk** — upstream `site.yml` and `k3s_server` role would need HA hooks added.
+- `roles/ha_kube_vip` (updated to v0.6.3 + load balancer)
+- `roles/ha_keepalived`
+- `roles/ha_etcd`
+- Configuration checks for `ha_cluster_vip` / `ha_cluster_method`
+- Externally-provided VIP option
+- Hooks in `site.yml` and reset
+
+#### PR 7 — `feat: additional packages, AppArmor, firewall`
+**Medium conflict risk** — touches `roles/prereq` which upstream has modified significantly.
+- AppArmor checks
+- Firewall exceptions
+- Additional manifests/packages for servers and agents
+- Broken iptables check
+
+#### PR 8 — `feat: download role enhancements`
+**High conflict risk** — upstream no longer has a standalone `download` role. Needs investigation
+to determine if this is still relevant or has been absorbed into `k3s_server`.
+
+---
+
+### Suggested Workflow
+
+```bash
+# One-time setup
+git fetch k3s-io
+
+# For each PR
+git checkout -b pr/NN-description k3s-io/main
+
+# Extract the fork's unique changes for that group
+git diff k3s-io/main..HEAD -- <relevant files>
+
+# Apply manually or cherry-pick individual commits without committing
+git cherry-pick -n <sha>
+
+# Resolve conflicts, adapt to upstream structure, then commit and push
+git push jss pr/NN-description
+```
+
+---
+
+### Suggested PR Order
+
+| # | Branch | Risk |
+|---|---|---|
+| 1 | `pr/01-idempotency-control-flow` | Low |
+| 2 | `pr/02-reset-role` | Low |
+| 3 | `pr/03-kubeconfig-localhost` | Low |
+| 4 | `pr/04-k3s-memory-variables` | Low |
+| 5 | `pr/05-config-validation-role` | Low |
+| 6 | `pr/06-ha-cluster-methods` | Medium |
+| 7 | `pr/07-additional-packages-apparmor-firewall` | Medium |
+| 8 | `pr/08-download-role-enhancements` | High — investigate first |
