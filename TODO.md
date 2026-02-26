@@ -8,7 +8,7 @@ I saw *k3s-ansible* could easily configure my hosts but was missing the HA compo
 Further research led me to the [k3s-ha](https://github.com/k3s-io/k3s-ansible/tree/k3s-ha)
 branch but found that it still was incomplete for my needs.
 In developing the needed additions, I discovered issues in the
-[master](https://github.com/k3s-io/k3s-ansible/tree/master) branch and spent a month
+[main](https://github.com/k3s-io/k3s-ansible/tree/main) branch and spent a month
 reviewing the yaml files of *k3s-ansible* and the shell scripts from
 [https://get.k3s.io](https://get.k3s.io).
 In the end, I brought *k3s-ansible* to be at near parity with https://get.k3s.io and
@@ -23,7 +23,7 @@ I implemented the HA embedded database using *etcd* and three cluster VIP method
 2. **kube-vip**: uses [kube-vip](https://kube-vip.io/) with arp arbitration
 3. **keepalived**: uses [keepalived](https://www.redhat.com/sysadmin/keepalived-basics) to implement VRRP
 
-These changes have now been merged onto my [master](https://github.com/jon-stumpf/k3s-ansible/tree/master).
+These changes have now been merged onto my [main](https://github.com/jon-stumpf/k3s-ansible/tree/main).
 This branch is stable.
 
 I have reached out to
@@ -33,13 +33,17 @@ to collaborate on closing the open issues and pull requests.
 I heard nothing back for almost two years until [dereknola](https://github.com/dereknola) informed
 me that he is now a maintainer for this repository.
 He unfortunately cancelled my pull requests and asked that I update/rebase my repository and resubmit.
-I am in the process of doing that now (11/23/2023).
+I started the process of doing that beginning on 2023-11-23.
+I stopped work in December 2023 due to the complexity of the rebasing.
 
-The *rebase* work is happening on the [rebase-upstream](https://github.com/jon-stumpf/k3s-ansible/tree/rebase-upstream) branch.
+The *rebase* work that I completed is on the [rebase-upstream](https://github.com/jon-stumpf/k3s-ansible/tree/rebase-upstream) branch.
 This branch is stable and incorporates all my previous work on *k3s-ansible* as well as tested changes that get
 this repository closer to upstream.
-I would like others to provide feedback on my work.
-Please, try it out.
+
+With the help of Claude Code, I am going to try to reimplement all of the functionality that I built in my repository on top of HEAD for k3s-io/k3s-ansible/main (2026-02-25).
+I will submit a series of incremental pull requests that bring my improvements into the k3s-io repository.
+First, I need to update my code to match the current versions of the scripts k3s-ansible installs (e.g., k3s-install.sh, k3s-uninstall.sh).
+These updates will be pushed to the [rebase-upstream](https://github.com/jon-stumpf/k3s-ansible/tree/rebase-upstream) branch first.
 
 # TODO
 
