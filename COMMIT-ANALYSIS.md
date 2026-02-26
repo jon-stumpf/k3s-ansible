@@ -255,21 +255,50 @@ to determine if this is still relevant or has been absorbed into `k3s_server`.
 
 ### Suggested Workflow
 
+#### Step 1 — Create the branch
+
 ```bash
-# One-time setup
 git fetch k3s-io
-
-# For each PR
 git checkout -b pr/NN-description k3s-io/main
+```
 
-# Extract the fork's unique changes for that group
-git diff k3s-io/main..HEAD -- <relevant files>
+#### Step 2 — Review the diffs
 
-# Apply manually or cherry-pick individual commits without committing
+Extract the fork's changes for the relevant files and review them before applying anything:
+
+```bash
+# See what changed in specific files or directories
+git diff k3s-io/main..rebase-upstream -- <file-or-directory>
+
+# See all files touched by the PR group
+git diff --name-only k3s-io/main..rebase-upstream -- <file-or-directory>
+```
+
+#### Step 3 — Apply changes incrementally
+
+Apply changes one logical sub-group at a time so each commit tells a clear story.
+Use `git cherry-pick -n` to stage without committing, letting you review and split as needed:
+
+```bash
+# Stage a specific commit's changes without committing
 git cherry-pick -n <sha>
 
-# Resolve conflicts, adapt to upstream structure, then commit and push
+# Or apply a file directly from the fork for manual editing
+git checkout rebase-upstream -- <file>
+
+# Review what's staged before committing
+git diff --staged
+
+# Commit each logical sub-group separately
+git add <specific files>
+git commit -m "descriptive message"
+```
+
+#### Step 4 — Push and open the PR
+
+```bash
 git push jss pr/NN-description
+gh pr create --base master --head jon-stumpf:pr/NN-description --title "..." --body "..."
 ```
 
 ---
