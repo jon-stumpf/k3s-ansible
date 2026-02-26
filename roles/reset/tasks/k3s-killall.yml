@@ -36,10 +36,10 @@
   ansible.builtin.include_tasks: umount_with_children.yml
   loop:
     - /run/k3s
+    - /run/flannel
     - "{{ k3s.dir.data }}"
-    - /var/lib/kubelet/pods
-    - /var/lib/kubelet/plugins
-    - /run/netns/cni-
+    - /var/lib/kubelet
+    - /run/netns/cni-  # k3s-kill.sh does not include this for some reason
   loop_control:
     loop_var: mounted_fs
 
@@ -90,6 +90,9 @@
     - cni0
     - flannel.1
     - flannel-v6.1
+    - kube-ipvs0
+    - flannel-wg
+    - flannel-wg-v6
   register: ip_link
   changed_when: ip_link.rc == 0
 
@@ -97,6 +100,19 @@
   ansible.builtin.file:
     path: /var/lib/cni
     state: absent
+
+#
+# Restart tailscale, if present
+#
+- name: Check if tailscale exists
+  ansible.builtin.command: which tailscale
+  changed_when: false
+  register: tailscale_exists
+  ignore_errors: yes
+
+- name: Restart tailscale
+  when: tailscale_exists
+  ansible.builtin.command: tailscale set --advertise-routes=
 
 #
 # iptables-save | grep -v KUBE- | grep -v CNI- | iptables-restore
