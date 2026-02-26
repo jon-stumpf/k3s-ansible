@@ -308,10 +308,11 @@ gh pr create --base master --head jon-stumpf:pr/NN-description --title "..." --b
 | # | Branch | Risk |
 |---|---|---|
 | 1 | `pr/01-idempotency-control-flow` | Low |
-| 2 | `pr/02-kubeconfig-localhost` | Low |
-| 3 | `pr/03-k3s-memory-variables` | Low |
-| 4 | `pr/04-config-validation-role` | Low |
-| 5 | `pr/05-reset-role` | Medium — only supports systemd; upstream also supports openrc |
-| 6 | `pr/06-ha-cluster-methods` | Medium |
-| 7 | `pr/07-additional-packages-apparmor-firewall` | Medium |
-| 8 | `pr/08-download-role-enhancements` | High — investigate first |
+| 2 | `pr/02-group-vars-reorganization` | Low — purely additive, no existing files modified |
+| 3 | `pr/03-kubeconfig-localhost` | Low |
+| 4 | `pr/04-k3s-memory-variables` | Low |
+| 5 | `pr/05-config-validation-role` | Low |
+| 6 | `pr/06-reset-role` | Medium — only supports systemd; upstream also supports openrc |
+| 7 | `pr/07-ha-cluster-methods` | Medium |
+| 8 | `pr/08-additional-packages-apparmor-firewall` | Medium |
+| 9 | `pr/09-download-role-enhancements` | High — investigate first |
