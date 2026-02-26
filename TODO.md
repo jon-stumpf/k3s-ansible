@@ -71,6 +71,7 @@ These updates will be pushed to the [rebase-upstream](https://github.com/jon-stu
 - [ ] Create playbooks for other common operations beyond install/uninstall
 - [ ] Create README.md files to document variables used by each HA method.
 - [x] Cleanup variables in playbook/group_vars/all.yml
+- [ ] Replace calls to ansible.builtin.systemd to ansible.builtin.service to support SysVInit-based systems
 
 # Progress Report
 
