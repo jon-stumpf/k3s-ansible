@@ -1,13 +1,13 @@
 ---
 
-# TODO: How do we use the node-token of defaults.cluster.first instead of k3s.cluster.token?
+# TODO: How do we use the node-token of defaults.cluster.endpoint instead of k3s.cluster.token?
 
 server_init_args: >-
-  {% if ansible_host == defaults.cluster.first %}
+  {% if ansible_host == defaults.cluster.endpoint %}
     --cluster-init
     --tls-san {{ k3s.cluster.address }}
   {% else %}
-    --server https://{{ defaults.cluster.first }}:{{ k3s.cluster.port }}
+    --server https://{{ defaults.cluster.endpoint }}:{{ k3s.cluster.port }}
   {% endif %}
   --token {{ k3s.cluster.token }}
   {{ k3s.args.server | default('') }}

@@ -17,7 +17,7 @@ vrrp_script k3s_check {
 }
 
 vrrp_instance {{ keepalived.option.instance_name }} {
-{% if ansible_host == defaults.cluster.first %}
+{% if ansible_host == defaults.cluster.endpoint %}
 	state MASTER
 	priority {{ keepalived.option.priority.master }}
 {% else %}
