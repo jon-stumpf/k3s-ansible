@@ -82,7 +82,7 @@ k3s_cluster:
 3. Provision your new cluster.
 
 ```bash
-ansible-playbook playbook/site.yml
+ansible-playbook playbooks/site.yml
 ```
 
 ## Kubeconfig
@@ -90,7 +90,7 @@ ansible-playbook playbook/site.yml
 To get access to your new **Kubernetes** cluster, just use the generated kube configuration file.
 
 ```bash
-kubectl --kubeconfig playbook/cluster.conf ...
+kubectl --kubeconfig playbooks/cluster.conf ...
 ```
 
 ## Local Testing

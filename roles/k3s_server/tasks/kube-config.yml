@@ -40,7 +40,7 @@
     - name: Fetch updated tempfile, {{ str }}
       vars:
         src: "{{ tempfile.path }}"
-        dest: "{{ k3s.config.cluster }}"  # placed in playbook/
+        dest: "{{ k3s.config.cluster }}"  # placed in playbooks/
         str: "{{ src }} --> {{ dest }}"
       ansible.builtin.fetch:
         src: "{{ src }}"
