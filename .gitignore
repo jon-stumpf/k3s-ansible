@@ -1,5 +1,6 @@
 .vscode
 .vagrant
 inventory.yml
+Vagrantfile
 playbooks/debug.yml
 playbooks/config-cluster
