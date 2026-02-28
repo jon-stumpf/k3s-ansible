@@ -2,19 +2,27 @@
 # Introduction
 
 `inventory.yml` is meant to be modified appropriately for your environment.
+The variables defined in this file are, by default, undefined.
+Users are expected to use/define these variables are their discretion and as necessary.
 
-Mandatory *ansible* variables that were previously here have moved to `playbooks/group_vars/all.yml`.
-Those variables are used within the playbooks and roles are not meant to be changed by a user of *k3s-ansible*.
-When adding a new _install_ variable (see *Install Variables* below), a corresponding variable is added to
+The variables defined here are validated and set corresponding variables in `playbooks/group_vars/all.yml`.
+The variables defined in `playbooks/group_vars/all.yml` are used throughout the playbooks and roles and
+are NOT meant to be changed by a user of *k3s-ansible*.
+In previous versions of *k3s-ansible*, there were mandatory *ansible* variables that were set in `inventory.yml`.
+That is no longer the case.
+
+When adding a new _install_ variable (see *Install k3s Variables* below), a corresponding variable is added to
 `playbooks/group_vars/all.yml` which is then used throughout *k3s-ansible*.
 
-## General Variables
+# Ansible Variables
 
 - **ansible_port**: specifies the port that is used for *ssh* to configure your hosts.
 The default is `22`.
 
 - **ansible_user**: specifies the username that has *ssh* password-less access to configure your hosts.
 The default is `debian`.
+
+# k3s Cluster Variables
 
 - **cluster_config**: specifies the location of where to capture the kube configuration file for the new cluster.
 The default is `playbooks/cluster.conf`.
@@ -41,31 +49,38 @@ The methods implemented today are:
 
 - **ha_k3s_token**: specifies k3s token used by hosts to join the cluster
 
-## Install Variables
+# Install k3s Variables
 
 If you have installed *k3s* from [https://get.k3s.io](https://get.k3s.io), these variables will be familiar.
 *Install* variables are meant to duplicate the install flags and environment variables found in the install script
 (see [Installation Options](https://rancher.com/docs/k3s/latest/en/installation/install-options/#options-for-installation-with-script)).
 Each variable has a prefix of `install_` and implements, to the extent possible, the actions of the shell script as documented below.
+(This is complete as of k3s [https://github.com/k3s-io/k3s/releases/tag/v1.35.1%2Bk3s1](v1.35.1+k3s1.))
 
-### Variables that control the version of *k3s* downloaded
+## Variables that control the version of *k3s* downloaded
 
 There are four (4) variables that control which version of *k3s* is installed on your hosts.
 
 - **install_k3s_commit**: specifies the commit of *k3s* to download from temporary cloud storage.
-The default is to leave this `undefined` as this variable is for developers and QA use. 
+The default is to leave this `undefined` as this variable is only for developers and QA use. 
+This variable is mutually exclusive with **install_k3s_version**.
 
 - **install_k3s_version**: specifies the version of *k3s* to download from Github.
 If left `undefined` (the default), *ansible* will attempt to download from a channel.
+This variable is mutually exclusive with **install_k3s_commit**.
 
 - **install_k3s_channel_url**: specifies the URL for the channels.
 The default is [https://update.k3s.io/v1-release/channels](https://update.k3s.io/v1-release/channels).
 It is not something typically changed but is implemented for completeness sake.
 
 - **install_k3s_channel**: specifies the channel from which to get the version.
-The default is the `stable` channel.  A typical channel used is `latest`.
+The default is the `stable` channel.  A typical alternative channel used is `latest`.
 
-### Variables that change the location of binaries and data
+- **install_k3s_artifact_url**: specifies the URL for the *k3s* release artifacts.
+The default is [https://github.com/k3s/releases/download](https://github.com/k3s/releases/download).
+This variable is unused at the moment, waiting on INSTALL_K3S_PR to be implemented (see below).
+
+## Variables that change the location of binaries and data
 
 There are three (3) variables that change the default location of files.
 
@@ -79,37 +94,40 @@ service and environment files.  The default is `/etc/systemd/system`.
 This defaults to `/var/lib/rancher/k3s`.
 Note: this is not (yet) an option in *k3s-io/k3s*.
 
-### Install Flags not yet implemented
+## Install k3s Variables not yet implemented
 
 These install flags have yet to be implemented are:
 
 | Install Flag | What it does |
 | :--- | :--- |
-| **INSTALL_K3S_SKIP_SELINUX_RPM** | If set to true, *ansible* will skip automatic installation of the *k3s* RPM.
-| **INSTALL_K3S_SELINUX_WARN** | If set to true, *ansible* will continue if the *k3s-selinux* policy is not found.
-| **INSTALL_K3S_NAME** | specifies the name of *systemd* service to create.
-| **INSTALL_K3S_TYPE** | specifies the type of *systemd* service to create.
+| **INSTALL_K3S_NAME** | Specifies the name of *systemd* service to create. |
+| **INSTALL_K3S_PR** | Specifies the PR build of *k3s* to download from GitHub Artifacts |
+| **INSTALL_K3S_SELINUX_WARN** | If set to true, *k3s* will continue if the *k3s-selinux* policy is not found. |
+| **INSTALL_K3S_SKIP_SELINUX_RPM** | If set to true, *k3s* will skip automatic installation of the *k3s* RPM. |
+| **INSTALL_K3S_SYMLINK** | If set to 'skip', *k3s* will not create symlinks; If set to 'force', *k3s* will overwrite files.  The default will symlink if the file does not exist in path. |
+| **INSTALL_K3S_TYPE** | Specifies the type of *systemd* service to create. |
 
 Currently, nothing will happen if these are set.
 
-### Install Flags that will not be implemented
+## Install k3s Variables that will not be implemented
 
 Lastly, some install flags did not make sense to implement with *k3s-ansible*:
 
 | Install Flag | What *k3s-ansible* does |
 | :--- | :--- |
-| **INSTALL_K3S_EXEC**          | *Implemented using _extra_ variables (see below) |
-| **INSTALL_K3S_SKIP_DOWNLOAD** | *k3s-ansible* always downloads the *k3s* binary and its hash. |
+| **INSTALL_K3S_BIN_DIR_READ_ONLY** | *k3s-ansible* always installs into the bin directory. |
+| **INSTALL_K3S_EXEC**          | Implemented using _extra_ variables (see below) |
 | **INSTALL_K3S_FORCE_RESTART** | *k3s-ansible* always restarts the service. |
+| **INSTALL_K3S_SKIP_DOWNLOAD** | *k3s-ansible* always downloads the *k3s* binary and its hash. |
 | **INSTALL_K3S_SKIP_ENABLE**   | *k3s-ansible* always enables the service. |
 | **INSTALL_K3S_SKIP_START**    | *k3s-ansible* always starts the service. |
 
-### Extra Variables
+# Extra Variables
 
 *k3s-ansible* provides additional functionality, exceeding the capabilities of *k3s-install.sh*.
 Each variable has a prefix of `extra_` and there are two per capability: one for servers and one for agents.
 
-### Variables for the *k3s* executable
+## Variables for the *k3s* executable
 
 The install script from [https://get.k3s.io/](https://get.k3s.io/) has one flag (**INSTALL_K3S_EXEC**) to
 provide extra arguments to the *k3s* executable.  *k3s-ansible* uses two *extra* variables to provide this capability.
