@@ -1,10 +1,13 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
 # ENV['VAGRANT_NO_PARALLEL'] = 'no'
 NODE_ROLES = ["server-0", "server-1", "server-2", "agent-0", "agent-1"]
-NODE_BOXES = ['generic/ubuntu2004', 'generic/ubuntu2004', 'generic/ubuntu2004', 'generic/ubuntu2004', 'generic/ubuntu2004']
+NODE_BOXES = ['bento/ubuntu-24.04', 'bento/ubuntu-24.04', 'bento/ubuntu-24.04', 'bento/ubuntu-24.04', 'bento/ubuntu-24.04']
 NODE_CPUS = 2
-NODE_MEMORY = 2048
+NODE_MEMORY = 1024
 # Virtualbox >= 6.1.28 require `/etc/vbox/network.conf` for expanded private networks 
-NETWORK_PREFIX = "10.10.10"
+NETWORK_PREFIX = "192.168.56"
 
 def provision(vm, role, node_num)
   vm.box = NODE_BOXES[node_num]
@@ -17,28 +20,30 @@ def provision(vm, role, node_num)
   # An expanded netmask is required to allow VM<-->VM communication, virtualbox defaults to /32
   vm.network "private_network", ip: node_ip, netmask: "255.255.255.0"
 
-  vm.provision "ansible", run: 'once' do |ansible|
-    ansible.compatibility_mode = "2.0"
-    ansible.playbook = "playbooks/site.yml"
-    ansible.groups = {
-      "server" => NODE_ROLES.grep(/^server/),
-      "agent" => NODE_ROLES.grep(/^agent/),
-      "k3s_cluster:children" => ["server", "agent"],
-    }
-    ansible.extra_vars = {
-      k3s.version.tag: "v1.26.9+k3s1",
-      k3s.cluster.address: "#{NETWORK_PREFIX}.100",
-      token: "myvagrant",
-      # Required to use the private network configured above
-      k3s.args.server: "--node-external-ip #{node_ip} --flannel-iface eth1", 
-      k3s.args.agent: "--node-external-ip #{node_ip} --flannel-iface eth1",
-      # Optional, left as reference for ruby-ansible syntax
-      # extra_service_envs: [ "NO_PROXY='localhost'" ],
-      # config_yaml: <<~YAML
-      #   write-kubeconfig-mode: 644
-      # YAML
-    }
-  end
+  vm.provision "shell", run: 'once', inline: "echo #{node_ip}"
+
+#  vm.provision "ansible", run: 'once' do |ansible|
+#    ansible.compatibility_mode = "2.0"
+#    ansible.playbook = "playbook/site.yml"
+#    ansible.groups = {
+#      "server" => NODE_ROLES.grep(/^server/),
+#      "agent" => NODE_ROLES.grep(/^agent/),
+#      "k3s_cluster:children" => ["server", "agent"],
+#    }
+#    ansible.extra_vars = {
+#      "k3s.version.tag" => "v1.26.9+k3s1",
+#      "k3s.cluster.endpoint" => "#{NETWORK_PREFIX}.100",
+#      "token" => "myvagrant",
+#      # Required to use the private network configured above
+#      "k3s.args.server" => "--node-external-ip #{node_ip} --flannel-iface eth1", 
+#      "k3s.args.agent" => "--node-external-ip #{node_ip} --flannel-iface eth1",
+#      # Optional, left as reference for ruby-ansible syntax
+#      # extra_service_envs: [ "NO_PROXY='localhost'" ],
+#      # config_yaml: <<~YAML
+#      #   write-kubeconfig-mode: 644
+#      # YAML
+#    }
+#  end
 end
 
 Vagrant.configure("2") do |config|
