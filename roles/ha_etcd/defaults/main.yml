@@ -5,7 +5,7 @@
 server_init_args: >-
   {% if ansible_host == defaults.cluster.endpoint %}
     --cluster-init
-    --tls-san {{ k3s.cluster.address }}
+    --tls-san {{ k3s.cluster.endpoint }}
   {% else %}
     --server https://{{ defaults.cluster.endpoint }}:{{ k3s.cluster.port }}
   {% endif %}

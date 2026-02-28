@@ -44,7 +44,7 @@ defaults:
     userdir: '.kube'  # The directory to be created in ~{{ ansible_user }}
     system: 'k3s.yaml'  # The name of the system config in {{ k3s.dir.etc }}
     local: 'config-local'  # The kubeconfig using localhost
-    cluster: 'config-cluster'  # The kubeconfig using {{ k3s.cluster.address }}
+    cluster: 'config-cluster'  # The kubeconfig using {{ k3s.cluster.endpoint }}
   cluster:
     method: 'keepalived'
     token: 'MySuperSecureToken'
@@ -118,7 +118,7 @@ k3s:
   cluster:
     method: "{{ ha_cluster_method | default(defaults.cluster.method) }}"
     token: "{{ ha_k3s_token | default(defaults.cluster.token) }}"
-    address: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else defaults.cluster.endpoint }}"
+    endpoint: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else defaults.cluster.endpoint }}"
     port: "{{ cluster_port | default(defaults.cluster.port) }}"
 
   memory:

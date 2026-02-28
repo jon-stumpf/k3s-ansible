@@ -30,10 +30,10 @@
 
     - name: Replace localhost cluster endpoint with {{ str }}
       vars:
-        str: "{{ k3s.cluster.address }}:{{ k3s.cluster.port }}"
+        str: "{{ k3s.cluster.endpoint }}:{{ k3s.cluster.port }}"
       ansible.builtin.command: >-
         {{ k3s.dir.bin }}/kubectl config set-cluster default
-          --server=https://{{ k3s.cluster.address }}:{{ k3s.cluster.port }}
+          --server=https://{{ k3s.cluster.endpoint }}:{{ k3s.cluster.port }}
           --kubeconfig {{ tempfile.path }}
       changed_when: false
 

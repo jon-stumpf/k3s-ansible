@@ -56,9 +56,9 @@
 
 - name: Wait for control plane at {{ str }}
   vars:
-    str: "{{ k3s.cluster.address }}:{{ k3s.cluster.port }}"
+    str: "{{ k3s.cluster.endpoint }}:{{ k3s.cluster.port }}"
   ansible.builtin.wait_for:
-    host: "{{ k3s.cluster.address }}"
+    host: "{{ k3s.cluster.endpoint }}"
     port: "{{ k3s.cluster.port }}"
     timeout: 60
   run_once: true

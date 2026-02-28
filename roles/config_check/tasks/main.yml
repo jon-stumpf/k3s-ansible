@@ -23,10 +23,10 @@
 
 - name: Check for a proper HA cluster virtual IP
   ansible.builtin.fail:
-    msg: "When HA is enabled, 'ha_cluster_vip' must have a valid IP address."
+    msg: "When HA is enabled, 'k3s.cluster.endpoint' must have a valid IP address."
   when:
     - ha_enabled
-    - (ha_cluster_vip is not defined) or not (ha_cluster_vip | ansible.netcommon.ipaddr)
+    - (k3s.cluster.endpoint is not defined) or not (k3s.cluster.endpoint | ansible.netcommon.ipaddr)
 
 - name: Check for a proper HA cluster method
   ansible.builtin.fail:

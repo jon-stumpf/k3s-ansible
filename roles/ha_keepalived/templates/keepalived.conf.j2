@@ -32,7 +32,7 @@ vrrp_instance {{ keepalived.option.instance_name }} {
 		auth_pass {{ keepalived.option.password }}
 	}
 	virtual_ipaddress {
-		{{ ha_cluster_vip }}/{{ keepalived.option.network_mask }}
+		{{ k3s.cluster.endpoint }}/{{ keepalived.option.network_mask }}
 	}
 	track_script {
 		k3s_check
