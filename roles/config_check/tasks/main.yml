@@ -35,6 +35,13 @@
     - k3s.cluster.enabled
     - k3s.cluster.method not in reference.cluster.methods
 
+- name: Check that only one (or none) of version tag or version commit are set.
+  ansible.builtin.fail:
+    msg: "Only one (or none) of k3s.version.tag or k3s.version.commit can be set."
+  when:
+    - k3s.version.tag != 'undefined'
+    - k3s.version.commit != 'undefined'
+
 - name: Determine version to download
   when: k3s.version.commit == 'undefined'
   check_mode: false
