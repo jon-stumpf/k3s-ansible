@@ -7,7 +7,7 @@
 - name: Initialize k3s HA embedded database, etcd
   ansible.builtin.include_role:
     name: "ha_etcd"
-  when: ha_enabled
+  when: k3s.cluster.enabled
 
 ################################################################################
 # Setup k3s service
@@ -47,7 +47,7 @@
   ansible.builtin.include_role:
     name: "{{ role }}"
   when:
-    - ha_enabled
+    - k3s.cluster.enabled
     - k3s.cluster.method != 'external'
 
 #######################################################################

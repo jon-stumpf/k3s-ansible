@@ -46,6 +46,7 @@ defaults:
     local: 'config-local'  # The kubeconfig using localhost
     cluster: 'config-cluster'  # The kubeconfig using {{ k3s.cluster.endpoint }}
   cluster:
+    enabled: false
     method: 'keepalived'
     token: 'MySuperSecureToken'
     endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
@@ -116,9 +117,10 @@ k3s:
     cluster: "{{ cluster_config | default(defaults.config.cluster) | basename }}"
 
   cluster:
+    enabled: "{{ ha_enabled | default(defaults.cluster.enabled) }}"
     method: "{{ ha_cluster_method | default(defaults.cluster.method) }}"
     token: "{{ ha_k3s_token | default(defaults.cluster.token) }}"
-    endpoint: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(false)) else defaults.cluster.endpoint }}"
+    endpoint: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(defaults.cluster.enabled)) else defaults.cluster.endpoint }}"
     port: "{{ cluster_port | default(defaults.cluster.port) }}"
 
   memory:

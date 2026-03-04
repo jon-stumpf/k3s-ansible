@@ -1,7 +1,5 @@
 ---
 
-ha_enabled: false
-
 # k3s:
 #  channel:
 #    tag: 'stable'

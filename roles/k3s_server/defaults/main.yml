@@ -1,7 +1,6 @@
 ---
 
 ansible_user: debian
-ha_enabled: false
 
 k3s:
   config:

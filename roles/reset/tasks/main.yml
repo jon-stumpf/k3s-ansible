@@ -13,7 +13,7 @@
 - name: Remove HA cluster method, {{ k3s.cluster.method }}
   ansible.builtin.include_tasks: "ha-{{ k3s.cluster.method }}.yml"
   when:
-    - ha_enabled
+    - k3s.cluster.enabled
     - k3s.cluster.method != 'external'
     - inventory_hostname in groups['server']
 
