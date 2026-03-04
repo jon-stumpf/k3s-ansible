@@ -10,7 +10,7 @@
   ansible.builtin.file:
     path: "{{ k3s.dir.bin }}/k3s"
     state: absent
-  when: remove_packages | bool
+  when: k3s.flags.remove.packages
 
 - name: Remove link to alternative K3s directory
   when: k3s.dir.data != defaults.dir.data
@@ -26,7 +26,7 @@
   ansible.builtin.package:
     name: k3s-selinux
     state: absent
-  when: remove_packages | bool
+  when: k3s.flags.remove.packages
 
 - name: Remove additional server packages
   ansible.builtin.package:
@@ -35,7 +35,7 @@
   with_items: "{{ extra_server_packages | default([]) }}"
   when:
     - inventory_hostname in groups['server']
-    - remove_packages | bool
+    - k3s.flags.remove.packages
 
 - name: Remove additional agent packages
   ansible.builtin.package:
@@ -44,7 +44,7 @@
   with_items: "{{ extra_agent_packages | default([]) }}"
   when:
     - inventory_hostname in groups['agent']
-    - remove_packages | bool
+    - k3s.flags.remove.packages
 
 - name: Remove yum repo files
   ansible.builtin.file:
@@ -54,7 +54,7 @@
     - "/etc/yum.repos.d/rancher-k3s-common*.repo"
   when:
     - ansible_pkg_mgr == "yum"
-    - remove_packages | bool
+    - k3s.flags.remove.packages
 
 - name: Remove zypper repo files
   ansible.builtin.file:
@@ -64,5 +64,5 @@
     - "/etc/zypp/repos.d/rancher-k3s-common*.repo"
   when:
     - ansible_pkg_mgr == "zypper"
-    - remove_packages | bool
+    - k3s.flags.remove.packages
 

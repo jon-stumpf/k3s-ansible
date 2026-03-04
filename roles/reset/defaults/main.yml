@@ -1,6 +1,3 @@
 ---
 ansible_user: debian
 
-# Changing this flag will keep the downloaded binaries after a reset
-remove_packages: true
-

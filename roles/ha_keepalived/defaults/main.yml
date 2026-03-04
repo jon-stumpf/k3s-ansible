@@ -26,7 +26,7 @@ keepalived:
 
   package:
     state: 'latest'
-    remove: "{{ remove_packages | default(true) | bool }}"
+    remove: "{{ k3s.flags.remove.packages }}"
 
   check:
     interval: 60  # Don't make this too low or servers will slow down or lock up

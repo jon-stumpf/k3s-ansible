@@ -128,3 +128,12 @@ k3s:
     max: "{{ service_memory_max | default(defaults.memory.max) }}"
     swapmax: "{{ service_memory_swapmax | default(defaults.memory.swapmax) }}"
 
+  flags:
+    report:
+      download_urls: "{{ report_download_urls | default(false) }}"
+      version_info: "{{ report_version_info | default(false) }}"
+    remove:
+      binaries: "{{ remove_binaries | default(false) }}"
+      config: "{{ remove_config | default(false) }}"
+      packages: "{{ remove_packages | default(false) }}"
+

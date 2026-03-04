@@ -50,7 +50,7 @@
         - name: Output channel information
           ansible.builtin.debug:
             var: version_url
-          when: report_download_urls
+          when: k3s.flags.report.download_urls
 
         - name: Get version from channel
           ansible.builtin.uri:
@@ -67,7 +67,7 @@
     - name: Output version
       ansible.builtin.debug:
         var: download_version
-      when: report_download_urls
+      when: k3s.flags.report.download_urls
       run_once: true
 
     - name: Determine GitHub URLs
@@ -85,7 +85,7 @@
       check_mode: false
 
     - name: Report Download URLs
-      when: report_download_urls
+      when: k3s.flags.report.download_urls
       check_mode: false
       block:
         - name: Report URL for binary

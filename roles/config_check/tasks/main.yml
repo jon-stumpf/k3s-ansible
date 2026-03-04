@@ -60,7 +60,7 @@
         - name: Output channel information
           ansible.builtin.debug:
             var: version_url
-          when: report_version_info
+          when: k3s.flags.report.version_info
 
         - name: Get version from channel
           ansible.builtin.uri:
@@ -77,7 +77,7 @@
     - name: Output version
       ansible.builtin.debug:
         var: download_version
-      when: report_version_info
+      when: k3s.flags.report.version_info
 
 - name: Check for minimum k3s version for HA configuration
   ansible.builtin.fail:
@@ -97,5 +97,5 @@
   when:
     - k3s.version.commit != 'undefined'
     - k3s.cluster.enabled
-    - report_version_info
+    - k3s.flags.report.version_info
 
