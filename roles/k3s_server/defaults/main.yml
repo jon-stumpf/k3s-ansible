@@ -1,8 +1,0 @@
----
-
-ansible_user: debian
-
-k3s:
-  config:
-    cluster: cluster.conf
-

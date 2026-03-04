@@ -43,5 +43,5 @@ keepalived:
       backup: 10
     advertisement_interval: 1
     network_mask: "{{ k3s.cluster.subnet_mask }}"
-    password: 'MySuperSecretVRRPPassword'
+    password: "{{ k3s.cluster.token }}"  # Reusing the k3s token.  Perhaps this should be different.
 
