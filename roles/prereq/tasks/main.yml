@@ -17,6 +17,7 @@
     value: "1"
     state: present
     reload: true
+  when: not ansible_check_mode
 
 - name: Enable IPv6 forwarding
   ansible.posix.sysctl:
@@ -24,7 +25,9 @@
     value: "1"
     state: present
     reload: true
-  when: ansible_all_ipv6_addresses | length > 0
+  when:
+    - ansible_all_ipv6_addresses | length > 0
+    - not ansible_check_mode
 
 - name: Populate service facts
   ansible.builtin.service_facts:
@@ -125,35 +128,38 @@
     - net.bridge.bridge-nf-call-iptables
     - net.bridge.bridge-nf-call-ip6tables
 
-- name: Check for Apparmor existence
-  ansible.builtin.stat:
-    path: /sys/module/apparmor/parameters/enabled
-  register: apparmor_enabled
+- name: Load Apparmor
+  when: not ansible_check_mode
+  block:
+    - name: Check for Apparmor existence
+      ansible.builtin.stat:
+        path: /sys/module/apparmor/parameters/enabled
+      register: apparmor_enabled
 
-- name: Check if Apparmor is enabled
-  when: apparmor_enabled.stat.exists
-  ansible.builtin.command: cat /sys/module/apparmor/parameters/enabled
-  register: apparmor_status
-  changed_when: false
+    - name: Check if Apparmor is enabled
+      when: apparmor_enabled.stat.exists
+      ansible.builtin.command: cat /sys/module/apparmor/parameters/enabled
+      register: apparmor_status
+      changed_when: false
 
-- name: Install Apparmor Parser [Suse]
-  when:
-    - ansible_os_family == 'Suse'
-    - apparmor_status is defined
-    - apparmor_status.stdout == "Y"
-  ansible.builtin.package:
-    name: apparmor-parser
-    state: present
+    - name: Install Apparmor Parser [Suse]
+      when:
+        - ansible_os_family == 'Suse'
+        - apparmor_status is defined
+        - apparmor_status.stdout == "Y"
+      ansible.builtin.package:
+        name: apparmor-parser
+        state: present
 
-- name: Install Apparmor Parser [Debian]
-  when:
-    - ansible_distribution == 'Debian'
-    - ansible_facts['distribution_major_version'] == "11"
-    - apparmor_status is defined
-    - apparmor_status.stdout == "Y"
-  ansible.builtin.package:
-    name: apparmor
-    state: present
+    - name: Install Apparmor Parser [Debian]
+      when:
+        - ansible_distribution == 'Debian'
+        - ansible_facts['distribution_major_version'] == "11"
+        - apparmor_status is defined
+        - apparmor_status.stdout == "Y"
+      ansible.builtin.package:
+        name: apparmor
+        state: present
 
 - name: Gather the package facts
   ansible.builtin.package_facts:
@@ -204,6 +210,7 @@
         state: link
 
 - name: Setup extra manifests
+  when: not ansible_check_mode
   block:
     - name: Make manifests directory
       ansible.builtin.file:

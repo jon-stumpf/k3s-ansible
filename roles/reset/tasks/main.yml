@@ -16,6 +16,7 @@
     - k3s.cluster.enabled
     - k3s.cluster.method != 'external'
     - inventory_hostname in groups['server']
+    - not ansible_check_mode
 
 #
 # /usr/local/bin/k3s-killall.sh

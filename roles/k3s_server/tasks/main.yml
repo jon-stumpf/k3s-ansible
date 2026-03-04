@@ -28,6 +28,7 @@
     daemon_reload: "{{ true if k3s_service.changed else false }}"
     state: "{{ 'restarted' if k3s_service.changed else 'started' }}"
     enabled: true
+  when: not ansible_check_mode
 
 - name: Perform node-token tasks
   ansible.builtin.include_tasks: "node-token.yml"
