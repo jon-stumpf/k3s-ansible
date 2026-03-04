@@ -51,6 +51,7 @@ defaults:
     token: 'MySuperSecureToken'
     endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
     port: '6443'
+    subnet_mask: '24'
   memory:
     high: '1G'
     max: '2G'
@@ -122,6 +123,7 @@ k3s:
     token: "{{ ha_k3s_token | default(defaults.cluster.token) }}"
     endpoint: "{{ (ha_cluster_vip | mandatory) if (ha_enabled | default(defaults.cluster.enabled)) else defaults.cluster.endpoint }}"
     port: "{{ cluster_port | default(defaults.cluster.port) }}"
+    subnet_mask: "{{ ha_cluster_subnet_mask | default(defaults.cluster.subnet_mask) }}"
 
   memory:
     high: "{{ service_memory_high | default(defaults.memory.high) }}"

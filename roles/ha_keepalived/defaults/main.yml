@@ -42,6 +42,6 @@ keepalived:
       master: 11
       backup: 10
     advertisement_interval: 1
-    network_mask: "{{ ha_cluster_subnet_mask | default('24') }}"
+    network_mask: "{{ k3s.cluster.subnet_mask }}"
     password: 'MySuperSecretVRRPPassword'
 
