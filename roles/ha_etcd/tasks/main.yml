@@ -24,7 +24,7 @@
                       -p Restart=on-failure \
                       --unit=k3s-init \
                       {{ k3s.dir.bin }}/k3s server {{ server_init_args }}"
-    creates: "{{ k3s.dir.systemd }}/k3s.service"
+    creates: "{{ k3s.dir.systemd }}/k3s-init.service"
 
 - name: Verification
   block:
