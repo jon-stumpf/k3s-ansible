@@ -6,7 +6,7 @@
 #       already been setup from a previous run.
 
 - name: Stop previous runs of k3s-init
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: k3s-init
     state: stopped
   failed_when: false
@@ -42,7 +42,7 @@
       changed_when: false
   always:
     - name: Kill the temporary service used for initialization
-      ansible.builtin.systemd:
+      ansible.builtin.systemd_service:
         name: k3s-init
         state: stopped
       failed_when: false

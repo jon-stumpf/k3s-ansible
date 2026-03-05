@@ -10,7 +10,7 @@
     mode: "u=rw,g=r,o=r"
 
 - name: Enable and check K3s service
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: k3s-agent
     daemon_reload: "{{ true if k3s_agent_service.changed else false }}"
     state: "{{ 'restarted' if k3s_agent_service.changed else 'started' }}"
