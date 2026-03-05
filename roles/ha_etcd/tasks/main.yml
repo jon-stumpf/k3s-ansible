@@ -5,13 +5,13 @@
 #       to the inventory after the cluster has
 #       already been setup from a previous run.
 
-- name: Clean previous runs of k3s-init
+- name: Stop previous runs of k3s-init
   ansible.builtin.systemd:
     name: k3s-init
     state: stopped
   failed_when: false
 
-- name: Clean previous runs of k3s-init
+- name: systemctl reset-failed k3s-init
   # The ansible systemd module does not support reset-failed
   ansible.builtin.command: systemctl reset-failed k3s-init  # noqa: command-instead-of-module
   failed_when: false
