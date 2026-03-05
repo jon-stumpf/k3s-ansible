@@ -20,6 +20,11 @@
       ansible.builtin.set_fact:
         token: "{{ node_token.content | b64decode | regex_replace('\n', '') }}"
 
+    - name: Report node-token
+      ansible.builtin.debug:
+        msg: "Node Token: {{ node_token.content }}"
+      when: k3s.flags.report.node_token
+
 - name: Setup dummy node-token
   when: ansible_check_mode
   ansible.builtin.set_fact:

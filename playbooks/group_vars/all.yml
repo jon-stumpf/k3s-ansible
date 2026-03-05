@@ -134,6 +134,7 @@ k3s:
     report:
       download_urls: "{{ report_download_urls | default(false) }}"
       version_info: "{{ report_version_info | default(false) }}"
+      node_token: "{{ report_node_token | default(false) }}"
     remove:
       binaries: "{{ remove_binaries | default(false) }}"
       config: "{{ remove_config | default(false) }}"
