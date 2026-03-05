@@ -198,7 +198,7 @@
     - name: Make parent of default data directory
       ansible.builtin.file:
         path: "{{ defaults.dir.data | dirname }}"
-        mode: 0755
+        mode: "u=rwx,g=rx,o=rx"
         state: directory
 
     - name: Create symlink to default data directory
@@ -215,14 +215,14 @@
     - name: Make manifests directory
       ansible.builtin.file:
         path: "{{ k3s.dir.data }}/server/manifests"
-        mode: 0700
+        mode: "u=rwx,g=,o="
         state: directory
 
     - name: Copy server manifests
       ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ k3s.dir.data }}/server/manifests"
-        mode: 0600
+        mode: "u=rw,g=,o="
       loop: "{{ k3s.manifests.server }}"
       when: inventory_hostname in groups['server']
 
@@ -230,7 +230,7 @@
       ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ k3s.dir.data }}/server/manifests"
-        mode: 0600
+        mode: "u=rw,g=,o="
       loop: "{{ k3s.manifests.agent }}"
       when: inventory_hostname in groups['agent']
 
@@ -259,10 +259,10 @@
     - name: Make config directory
       ansible.builtin.file:
         path: "/etc/rancher/k3s"
-        mode: 0755
+        mode: "u=rwx,g=rx,o=rx"
         state: directory
     - name: Copy config values
       ansible.builtin.copy:
         content: "{{ config_yaml }}"
         dest: "/etc/rancher/k3s/config.yaml"
-        mode: 0644
+        mode: "u=rw,g=r,o=r"
