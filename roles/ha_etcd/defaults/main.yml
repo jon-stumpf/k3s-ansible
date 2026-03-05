@@ -2,7 +2,7 @@
 
 # TODO: How do we use the node-token of defaults.cluster.endpoint instead of k3s.cluster.token?
 
-server_init_args: >-
+tmp_args: >-
   {% if ansible_host == defaults.cluster.endpoint %}
     --cluster-init
     --tls-san {{ k3s.cluster.endpoint }}
@@ -11,4 +11,6 @@ server_init_args: >-
   {% endif %}
   --token {{ k3s.cluster.token }}
   {{ k3s.args.server | default('') }}
+
+server_init_args: "{{ tmp_args | split('\n') | join }}"
 
