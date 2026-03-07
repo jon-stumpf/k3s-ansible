@@ -20,4 +20,6 @@
     name: linux-modules-extra-raspi
     update_cache: "{{ airgap_dir is not defined }}"
     state: present
-  when: "ansible_distribution_version is version('20.10', '>=') and ansible_distribution_version is version('24.04', '<')"
+  when:
+    - "ansible_distribution_version is version('20.10', '>=')"
+    - "ansible_distribution_version is version('24.04', '<')"
