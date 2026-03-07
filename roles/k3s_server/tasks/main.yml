@@ -44,9 +44,9 @@
 
 - name: Setup HA cluster method, {{ k3s.cluster.method | default('n/a') }}
   vars:
-    role: "{{ reference.cluster.roles[k3s.cluster.method] }}"
+    k3s_server_role: "{{ reference.cluster.roles[k3s.cluster.method] }}"
   ansible.builtin.include_role:
-    name: "{{ role }}"
+    name: "{{ k3s_server_role }}"
   when:
     - k3s.cluster.enabled
     - k3s.cluster.method != 'external'
