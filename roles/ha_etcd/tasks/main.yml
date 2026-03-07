@@ -11,7 +11,7 @@
     state: stopped
   failed_when: false
 
-- name: systemctl reset-failed k3s-init
+- name: Run systemctl reset-failed k3s-init
   # The ansible systemd module does not support reset-failed
   ansible.builtin.command: systemctl reset-failed k3s-init  # noqa: command-instead-of-module
   failed_when: false
