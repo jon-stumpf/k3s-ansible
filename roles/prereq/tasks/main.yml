@@ -6,7 +6,7 @@
     update_cache: true
 
 - name: Set SELinux to disabled state
-  selinux:
+  ansible.posix.selinux:
     state: disabled
   when: ansible_os_family == 'RedHat'
 
