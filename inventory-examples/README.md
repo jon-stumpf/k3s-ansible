@@ -28,7 +28,7 @@ The default is `debian`.
 These variables are the names of directories or files used in the k3s installation.
 These variables are always basenames, never paths.
 
-- **kube_dir**: This is the directory name (not path) of the directory that holds the user k3s configuration files,
+- **kube_config**: This is the directory name (not path) of the directory that holds the user k3s configuration files,
 typically found in the HOME directory of the user.
 The default is `.kube'.
 

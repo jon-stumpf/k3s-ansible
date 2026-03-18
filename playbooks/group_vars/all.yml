@@ -112,7 +112,7 @@ k3s:
 
   config:
     # k3s_config variables are always basenames, relative to the directories in which they are put
-    userdir: "{{ kube_dir | default(defaults.config.userdir) | basename }}"
+    userdir: "{{ kube_config | default(defaults.config.userdir) | basename }}"
     system: "{{ system_config | default(defaults.config.system) | basename }}"
     local: "{{ local_config | default(defaults.config.local) | basename }}"
     cluster: "{{ cluster_config | default(defaults.config.cluster) | basename }}"
