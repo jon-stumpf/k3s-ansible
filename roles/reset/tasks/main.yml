@@ -93,7 +93,7 @@
     path: "{{ item }}"
     state: absent
   loop:
-    - /etc/rancher/k3s
+    - "{{ k3s.dir.etc }}"
     - /run/k3s
     - /run/flannel
     - "{{ k3s.dir.data }}"

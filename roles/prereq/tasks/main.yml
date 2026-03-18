@@ -258,11 +258,11 @@
   block:
     - name: Make config directory
       ansible.builtin.file:
-        path: "/etc/rancher/k3s"
+        path: "{{ k3s.dir.etc }}"
         mode: "u=rwx,g=rx,o=rx"
         state: directory
     - name: Copy config values
       ansible.builtin.copy:
         content: "{{ config_yaml }}"
-        dest: "/etc/rancher/k3s/config.yaml"
+        dest: "{{ k3s.dir.etc }}/config.yaml"
         mode: "u=rw,g=r,o=r"

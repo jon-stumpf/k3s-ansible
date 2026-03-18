@@ -3,7 +3,7 @@
 - name: Remove optional config file
   when: config_yaml is defined
   ansible.builtin.file:
-    path: "/etc/rancher/k3s/config.yaml"
+    path: "{{ k3s.dir.etc }}/config.yaml"
     state: absent
 
 - name: Remove downloaded k3s binary
