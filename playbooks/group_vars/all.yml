@@ -41,7 +41,7 @@ defaults:
     data: '/var/lib/rancher/k3s'
     etc: '/etc/rancher/k3s'
   config:  # There are always basenames, never paths
-    userdir: '.kube'  # The directory to be created in ~{{ ansible_user }}
+    kubedir: '.kube'  # The directory to be created in ~{{ ansible_user }}
     system: 'k3s.yaml'  # The name of the system config in {{ k3s.dir.etc }}
     local: 'config-local'  # The kubeconfig using localhost
     cluster: 'config-cluster'  # The kubeconfig using {{ k3s.cluster.endpoint }}
@@ -112,7 +112,7 @@ k3s:
 
   config:
     # k3s_config variables are always basenames, relative to the directories in which they are put
-    userdir: "{{ kube_config | default(defaults.config.userdir) | basename }}"
+    kubedir: "{{ kube_config | default(defaults.config.kubedir) | basename }}"
     system: "{{ system_config | default(defaults.config.system) | basename }}"
     local: "{{ local_config | default(defaults.config.local) | basename }}"
     cluster: "{{ cluster_config | default(defaults.config.cluster) | basename }}"

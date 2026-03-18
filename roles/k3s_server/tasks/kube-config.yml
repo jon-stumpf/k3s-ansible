@@ -62,7 +62,7 @@
   block:
     - name: Create local kubeconfig directory, {{ path }}
       vars:
-        path: "~{{ ansible_user }}/{{ k3s.config.userdir }}"
+        path: "~{{ ansible_user }}/{{ k3s.config.kubedir }}"
       ansible.builtin.file:
         path: "{{ path }}"
         state: directory
@@ -72,7 +72,7 @@
     - name: Copy cluster config, {{ str }}
       vars:
         src: "{{ k3s.config.cluster }}"
-        dest: "~{{ ansible_user }}/{{ k3s.config.userdir }}/{{ k3s.config.cluster }}"
+        dest: "~{{ ansible_user }}/{{ k3s.config.kubedir }}/{{ k3s.config.cluster }}"
         str: "{{ src }} --> {{ dest }}"
       ansible.builtin.copy:
         src: "{{ src }}"
@@ -83,7 +83,7 @@
     - name: Copy localhost config, {{ str }}
       vars:
         src: "{{ k3s.dir.etc }}/{{ k3s.config.system }}"
-        dest: "~{{ ansible_user }}/{{ k3s.config.userdir }}/{{ k3s.config.local }}"
+        dest: "~{{ ansible_user }}/{{ k3s.config.kubedir }}/{{ k3s.config.local }}"
         str: "{{ src }} --> {{ dest }}"
       ansible.builtin.copy:
         remote_src: true
