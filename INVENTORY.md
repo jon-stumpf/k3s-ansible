@@ -30,18 +30,20 @@ These variables are always basenames, never paths.
 
 - **kube_config**: This is the directory name (not path) of the directory that holds the user k3s configuration files,
 typically found in the HOME directory of the user.
-The default is `.kube'.
+The default directory name is `.kube'.
 
 - **system_config**: This is the filename of the system configuration file,
-typically found in `/etc/rancher/k3s'.
+typically found in `/etc/rancher/k3s`.
 The default is `k3s.yaml'.
 
 - **local_config**: This is the filename of the kubeconfig using *localhost* as the cluster endpoint.
-The default is `config-local'.
+This is placed in the **kube_config** directory.
+The default filename is `config-local'.
 
 - **system_config**: This is the filename of the kubeconfig using the k3s *cluster endpoint*,
 typically the first server defined in the cluster.
-The default is `config-cluster'.
+This is placed in the `playbooks` directory.
+The default filename is `config-cluster`.
 
 ## Service Memory Variables
 These variables are used in the creation of the k3s server and agent systemd unit files.
@@ -62,9 +64,9 @@ The default is `6443`.
 
 ## Remove Variables
 
-These variables are used when resetting the cluster (`playbooks/roles/reset.yml').
+These variables are used when resetting the cluster (`playbooks/roles/reset.yml`).
 The default is `false` for all variables.
-When all variables are set to `true', the evidence of the k3s installation is removed.
+When all variables are set to `true`, the evidence of the k3s installation is removed.
 
 - **remove_binaries**: remove the k3s binaries that were installed.
 
