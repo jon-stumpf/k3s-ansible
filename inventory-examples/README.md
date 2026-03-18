@@ -58,6 +58,8 @@ The default is `playbooks/cluster.conf`.
 - **cluster_port**: specifies the port used for the k3s cluster service.
 The default is `6443`.
 
+- **cluster_token**: specifies k3s token used by hosts to join the cluster.
+
 ## Remove Variables
 
 These variables are used when resetting the cluster (`playbooks/roles/reset.yml').
@@ -99,8 +101,6 @@ The methods implemented today are:
     1. `external` - requires a load-balancer external to the cluster
     2. `kube-vip` - [https://kube-vip.io](https://kube-vip.io), arp-based daemonset using leader election
     3. `keepalived` - all *k3s* servers are configured with [keepalived](https://www.redhat.com/sysadmin/keepalived-basics) to manage a VRRP instance
-
-- **ha_k3s_token**: specifies k3s token used by hosts to join the cluster
 
 # Install k3s Variables
 

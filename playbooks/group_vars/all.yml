@@ -120,7 +120,7 @@ k3s:
   cluster:
     enabled: "{{ ha_enabled | default(defaults.cluster.enabled) }}"
     method: "{{ ha_cluster_method | default(defaults.cluster.method) }}"
-    token: "{{ ha_k3s_token | default(defaults.cluster.token) }}"
+    token: "{{ cluster_token | default(defaults.cluster.token) }}"
     endpoint: "{{ (ha_cluster_vip | mandatory) \
                if (ha_enabled | default(defaults.cluster.enabled)) else defaults.cluster.endpoint }}"
     port: "{{ cluster_port | default(defaults.cluster.port) }}"
