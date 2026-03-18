@@ -22,13 +22,64 @@ The default is `22`.
 - **ansible_user**: specifies the username that has *ssh* password-less access to configure your hosts.
 The default is `debian`.
 
-# k3s Cluster Variables
+# k3s Variables
+
+## Configuration Variables
+These variables are the names of directories or files used in the k3s installation.
+These variables are always basenames, never paths.
+
+- **kube_dir**: This is the directory name (not path) of the directory that holds the user k3s configuration files,
+typically found in the HOME directory of the user.
+The default is `.kube'.
+
+- **system_config**: This is the filename of the system configuration file,
+typically found in `/etc/rancher/k3s'.
+The default is `k3s.yaml'.
+
+- **local_config**: This is the filename of the kubeconfig using *localhost* as the cluster endpoint.
+The default is `config-local'.
+
+- **system_config**: This is the filename of the kubeconfig using the k3s *cluster endpoint*,
+typically the first server defined in the cluster.
+The default is `config-cluster'.
+
+## Service Memory Variables
+These variables are used in the creation of the k3s server and agent systemd unit files.
+
+- **service_memory_high**:
+- **service_memory_max**:
+- **service_memory_swapmax**:
+
+## Cluster Variables
 
 - **cluster_config**: specifies the location of where to capture the kube configuration file for the new cluster.
 The default is `playbooks/cluster.conf`.
 
 - **cluster_port**: specifies the port used for the k3s cluster service.
 The default is `6443`.
+
+## Remove Variables
+
+These variables are used when resetting the cluster (`playbooks/roles/reset.yml').
+The default is `false` for all variables.
+When all variables are set to `true', the evidence of the k3s installation is removed.
+
+- **remove_binaries**: remove the k3s binaries that were installed.
+
+- **remove_config**: remove the k3s configuration files produced for the cluster.
+
+- **remove_packages**: remove the k3s packages downloaded and used for the installation.
+
+## Reporting Variables
+
+- **report_download_urls**: reports the URLs that will be used to download k3s.
+The default is the `stable' channel.
+
+- **report_version_info**: reports the version of k3s that will be installed.
+The default is the latest version from the `stable' channel.
+
+- **report_node_token**: reports the node token used for the cluster.
+The default is the node token of the first server configured.
 
 ## High-Availability (HA) Variables
 
@@ -41,6 +92,8 @@ Note: This is an IP address different than those of the cluster nodes.
 Today, this is a static IP address provided in this file.
 It is possible to get an IP address dynamically but that is not implemented here.
 
+- **ha_subnet_mask**: specifies the subnet mask of the VIP used by the cluster method.
+
 - **ha_cluster_method**: specifies the method of clustering to use for the virtual IP.
 The methods implemented today are:
     1. `external` - requires a load-balancer external to the cluster
@@ -51,13 +104,13 @@ The methods implemented today are:
 
 # Install k3s Variables
 
-If you have installed *k3s* from [https://get.k3s.io](https://get.k3s.io), these variables will be familiar.
-*Install* variables are meant to duplicate the install flags and environment variables found in the install script
+If you have installed *k3s* from [https://get.k3s.io](https://get.k3s.io) before, these variables will be familiar.
+*Install k3s* variables here are meant to duplicate the install flags and environment variables found in the install script
 (see [Installation Options](https://rancher.com/docs/k3s/latest/en/installation/install-options/#options-for-installation-with-script)).
-Each variable has a prefix of `install_` and implements, to the extent possible, the actions of the shell script as documented below.
+Each variable has a prefix of `install_k3s_` and implements, to the extent possible, the actions of the shell script as documented below.
 (This is complete as of k3s [https://github.com/k3s-io/k3s/releases/tag/v1.35.1%2Bk3s1](v1.35.1+k3s1.))
 
-## Variables that control the version of *k3s* downloaded
+## Install k3s Variables that control the version of *k3s* downloaded
 
 There are four (4) variables that control which version of *k3s* is installed on your hosts.
 
@@ -80,7 +133,7 @@ The default is the `stable` channel.  A typical alternative channel used is `lat
 The default is [https://github.com/k3s/releases/download](https://github.com/k3s/releases/download).
 This variable is unused at the moment, waiting on INSTALL_K3S_PR to be implemented (see below).
 
-## Variables that change the location of binaries and data
+## Install k3s Variables that change the location of binaries and data
 
 There are three (3) variables that change the default location of files.
 
@@ -116,18 +169,18 @@ Lastly, some install flags did not make sense to implement with *k3s-ansible*:
 | Install Flag | What *k3s-ansible* does |
 | :--- | :--- |
 | **INSTALL_K3S_BIN_DIR_READ_ONLY** | *k3s-ansible* always installs into the bin directory. |
-| **INSTALL_K3S_EXEC**          | Implemented using _extra_ variables (see below) |
-| **INSTALL_K3S_FORCE_RESTART** | *k3s-ansible* always restarts the service. |
-| **INSTALL_K3S_SKIP_DOWNLOAD** | *k3s-ansible* always downloads the *k3s* binary and its hash. |
-| **INSTALL_K3S_SKIP_ENABLE**   | *k3s-ansible* always enables the service. |
-| **INSTALL_K3S_SKIP_START**    | *k3s-ansible* always starts the service. |
+| **INSTALL_K3S_EXEC**              | Implemented using _extra_ variables (see below) |
+| **INSTALL_K3S_FORCE_RESTART**     | *k3s-ansible* always restarts the service. |
+| **INSTALL_K3S_SKIP_DOWNLOAD**     | *k3s-ansible* always downloads the *k3s* binary and its hash. |
+| **INSTALL_K3S_SKIP_ENABLE**       | *k3s-ansible* always enables the service. |
+| **INSTALL_K3S_SKIP_START**        | *k3s-ansible* always starts the service. |
 
 # Extra Variables
 
 *k3s-ansible* provides additional functionality, exceeding the capabilities of *k3s-install.sh*.
 Each variable has a prefix of `extra_` and there are two per capability: one for servers and one for agents.
 
-## Variables for the *k3s* executable
+## Extra Variables for the *k3s* executable
 
 The install script from [https://get.k3s.io/](https://get.k3s.io/) has one flag (**INSTALL_K3S_EXEC**) to
 provide extra arguments to the *k3s* executable.  *k3s-ansible* uses two *extra* variables to provide this capability.
