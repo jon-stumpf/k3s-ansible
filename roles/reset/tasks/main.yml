@@ -102,9 +102,9 @@
     - "{{ k3s.dir.bin }}/k3s-killall.sh"    # From https://get.k3s.io
     - "{{ k3s.dir.bin }}/k3s-uninstall.sh"  # From https://get.k3s.io
 
-- name: Remove ~/.kube directory
+- name: Remove ~{{ ansible_user }}/{{ k3s.config.kubedir }} directory
   ansible.builtin.file:
-    path: "~{{ ansible_user }}/.kube"
+    path: "~{{ ansible_user }}/{{ k3s.config.kubedir }}"
     state: absent
   when: inventory_hostname in groups['server']
 
