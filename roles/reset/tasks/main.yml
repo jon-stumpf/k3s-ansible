@@ -57,7 +57,16 @@
 #    exit
 # fi
 #
-# Should this be done rather than focusing on a discrete list of services (reference.service.names)?
+
+- name: Check for additional k3s services
+  ansible.builtin.find:
+    paths: "{{ k3s.dir.systemd }}"
+    patterns: "k3s*.service"
+    file_type: file
+  register: find_k3s
+  failed_when: find_k3s.matched > 0
+
+# TODO: list out the services in a user-friendly way if any were found
 
 #
 # for cmd in kubectl crictl ctr; do
