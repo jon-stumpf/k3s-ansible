@@ -17,6 +17,16 @@ The fork contains pull requests created years ago that addressed open issues and
 
 > **Note:** HA method `kube-vip` is currently broken.
 
+## Repository Rules
+
+These rules apply to all code in this fork (`rebase-upstream` and its descendants). The scope column says how each one applies to PR branches built for upstream.
+
+| # | Rule | Upstream PR branches |
+|---|------|----------------------|
+| 1 | **Reentrant and idempotent.** Every playbook can be re-run safely. A second run against an unchanged cluster reports no changes and does not fail. Gate state-changing tasks with `creates:`/`removes:`, `changed_when:`, or a prior check instead of relying on reruns to succeed. | Applies. |
+| 2 | **Builtins and modules over shell.** Avoid `ansible.builtin.shell`/`command` callouts as much as practical; use an Ansible builtin or a module instead. When a callout is unavoidable, give it an accurate `changed_when:` (and `creates:`/`removes:` where they fit) so rule 1 still holds. | Applies to new code. Replacing upstream's existing `k3s-install.sh`/`k3s-uninstall.sh` calls waits until the maintainer accepts that change. |
+| 3 | **Constants live in dictionaries.** Scalars, strings, and lists used more than once across the repo (paths, service names, URLs, package lists) are defined once in a dictionary (see *Variable System* below), and tasks reference the dictionary value, never a repeated literal. | **Does not apply** — until the final PR. Upstream PRs use upstream's flat variable names. The dictionary structure goes upstream as the **very last PR** in the series, because it asks the maintainer to reconsider upstream's flat-variable principle. |
+
 ## Rebase Workflow
 
 1. Analyze all commits in the `jss` fork relative to upstream `k3s-io/main`.
