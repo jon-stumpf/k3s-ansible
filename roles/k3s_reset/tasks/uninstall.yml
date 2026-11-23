@@ -1,0 +1,155 @@
+---
+# Native Ansible equivalent of k3s-uninstall.sh / k3s-agent-uninstall.sh
+# from https://get.k3s.io. The script's commands are quoted above each step.
+
+# systemctl disable <name>; systemctl daemon-reload
+# rc-update delete <name> default
+- name: Disable the k3s service
+  when: k3s_reset_services_found.files | map(attribute='path') | map('basename')
+        | select('in', [k3s_reset_service, k3s_reset_service ~ '.service']) | list | length > 0
+  ansible.builtin.service:
+    name: "{{ k3s_reset_service }}"
+    enabled: false
+
+# rm -f $FILE_K3S_SERVICE $FILE_K3S_ENV; trap 'rm -f $UNINSTALL_K3S_SH' EXIT
+- name: Remove the k3s service definition and install scripts
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ systemd_dir }}/{{ k3s_reset_service }}.service"
+    - "{{ systemd_dir }}/{{ k3s_reset_service }}.service.env"
+    - "/etc/init.d/{{ k3s_reset_service }}"
+    - "/etc/rancher/k3s/{{ k3s_reset_service }}.env"
+    - "{{ k3s_reset_bin_dir }}/{{ k3s_reset_service }}-uninstall.sh"
+  register: k3s_reset_service_files
+
+# systemctl daemon-reload; systemctl reset-failed <name>
+- name: Reload systemd
+  when:
+    - ansible_facts['service_mgr'] == 'systemd'
+    - k3s_reset_service_files.changed
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
+# if (ls ${SYSTEMD_DIR}/k3s*.service || ls /etc/init.d/k3s*); then
+#     echo 'Additional k3s services installed, skipping uninstall of k3s'; exit; fi
+- name: Find other k3s services
+  ansible.builtin.find:
+    paths:
+      - "{{ systemd_dir }}"
+      - /etc/init.d
+    patterns:
+      - "k3s*"
+    excludes:
+      - "*.env"
+  register: k3s_reset_other_services
+
+- name: Report other k3s services
+  when: k3s_reset_other_services.matched > 0
+  ansible.builtin.debug:
+    msg: >-
+      Additional k3s services installed, skipping uninstall of k3s:
+      {{ k3s_reset_other_services.files | map(attribute='path') | join(', ') }}
+
+- name: Remove k3s
+  when: k3s_reset_other_services.matched == 0
+  block:
+    # for cmd in kubectl crictl ctr; do [ -L $BIN_DIR/$cmd ] && rm -f $BIN_DIR/$cmd; done
+    - name: Check k3s command links
+      ansible.builtin.stat:
+        path: "{{ k3s_reset_bin_dir }}/{{ item }}"
+      loop: "{{ k3s_reset_symlinked_commands }}"
+      register: k3s_reset_commands
+
+    - name: Remove k3s command links
+      when: item.stat.islnk | default(false)
+      ansible.builtin.file:
+        path: "{{ item.stat.path }}"
+        state: absent
+      loop: "{{ k3s_reset_commands.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
+    # rm -rf /etc/rancher/k3s /run/k3s /run/flannel /var/lib/kubelet
+    # rm -f $BIN_DIR/k3s $KILLALL_K3S_SH (and k3s-install.sh, which the roles download)
+    - name: Remove k3s files and directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/rancher/k3s
+        - /run/k3s
+        - /run/flannel
+        - /var/lib/kubelet
+        - "{{ k3s_reset_bin_dir }}/k3s"
+        - "{{ k3s_reset_bin_dir }}/k3s-killall.sh"
+        - "{{ k3s_reset_bin_dir }}/k3s-install.sh"
+
+    # clean_mounted_directory ${K3S_DATA_DIR}
+    # The data directory may be a symlink to k3s_server_location (see the prereq
+    # role). A custom location, or one that is a mount point, is emptied and kept;
+    # otherwise the directory itself is removed.
+    - name: Remove the k3s data directory
+      when:
+        - k3s_server_location == k3s_reset_data_dir
+        - k3s_server_location not in (ansible_facts['mounts'] | default([]) | map(attribute='mount'))
+      ansible.builtin.file:
+        path: "{{ k3s_server_location }}"
+        state: absent
+
+    - name: Find the contents of the k3s data directory
+      when: >-
+        k3s_server_location != k3s_reset_data_dir
+        or k3s_server_location in (ansible_facts['mounts'] | default([]) | map(attribute='mount'))
+      ansible.builtin.find:
+        paths: "{{ k3s_server_location }}"
+        file_type: any
+        hidden: true
+      register: k3s_reset_data_contents
+
+    - name: Remove the contents of the k3s data directory
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ k3s_reset_data_contents.files | default([]) }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+    - name: Remove the k3s data directory or its link
+      when: k3s_server_location != k3s_reset_data_dir
+      ansible.builtin.file:
+        path: "{{ k3s_reset_data_dir }}"
+        state: absent
+
+    # Remove the k3s-selinux package and its repo files
+    - name: Remove the k3s-selinux package
+      when:
+        - k3s_reset_remove_packages | bool
+        - ansible_facts['pkg_mgr'] in ['dnf', 'dnf5', 'yum', 'zypper']
+      ansible.builtin.package:
+        name: k3s-selinux
+        state: absent
+
+    - name: Find rancher-k3s-common repo files
+      when:
+        - k3s_reset_remove_packages | bool
+        - ansible_facts['pkg_mgr'] in ['dnf', 'dnf5', 'yum', 'zypper']
+      ansible.builtin.find:
+        paths: "{{ '/etc/zypp/repos.d' if ansible_facts['pkg_mgr'] == 'zypper' else '/etc/yum.repos.d' }}"
+        patterns: "rancher-k3s-common*.repo"
+      register: k3s_reset_repo_files
+
+    - name: Remove rancher-k3s-common repo files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ k3s_reset_repo_files.files | default([]) }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+# Not in k3s-uninstall.sh: files the k3s_server role adds.
+- name: Remove user kubeconfig
+  ansible.builtin.file:
+    path: "~{{ ansible_user }}/.kube/config"
+    state: absent

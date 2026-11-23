@@ -1,0 +1,34 @@
+---
+# Native Ansible equivalent of k3s-uninstall.sh / k3s-agent-uninstall.sh
+# (and the k3s-killall.sh they call) from https://get.k3s.io.
+# Each step is idempotent: a second run against a reset host changes nothing.
+
+- name: Find k3s service definitions
+  ansible.builtin.find:
+    paths:
+      - "{{ systemd_dir }}"
+      - /etc/init.d
+    patterns:
+      - "k3s*.service"
+      - "k3s*"
+    excludes:
+      - "*.env"
+  register: k3s_reset_services_found
+
+- name: Check for k3s on this host
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  loop:
+    - "{{ k3s_reset_bin_dir }}/k3s"
+    - "{{ k3s_reset_data_dir }}"
+    - /run/k3s
+  register: k3s_reset_present
+
+- name: Stop k3s and clean up its runtime state
+  when: >-
+    k3s_reset_services_found.matched > 0
+    or k3s_reset_present.results | selectattr('stat.exists') | list | length > 0
+  ansible.builtin.include_tasks: killall.yml
+
+- name: Remove the k3s installation
+  ansible.builtin.include_tasks: uninstall.yml

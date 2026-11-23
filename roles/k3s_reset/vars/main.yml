@@ -1,0 +1,21 @@
+---
+# Paths fixed by the k3s install script (https://get.k3s.io).
+k3s_reset_bin_dir: /usr/local/bin
+k3s_reset_data_dir: /var/lib/rancher/k3s  # always this path; prereq symlinks k3s_server_location here
+k3s_reset_service: "{{ 'k3s' if inventory_hostname in groups[server_group | default('server')] else 'k3s-agent' }}"
+k3s_reset_unmount_prefixes:
+  - /run/k3s
+  - /var/lib/kubelet/pods
+  - /var/lib/kubelet/plugins
+  - /run/netns/cni-
+k3s_reset_cni_interfaces:
+  - cni0
+  - flannel.1
+  - flannel-v6.1
+  - kube-ipvs0
+  - flannel-wg
+  - flannel-wg-v6
+k3s_reset_symlinked_commands:
+  - kubectl
+  - crictl
+  - ctr

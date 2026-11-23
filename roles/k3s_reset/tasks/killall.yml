@@ -1,0 +1,141 @@
+---
+# Native Ansible equivalent of k3s-killall.sh from https://get.k3s.io.
+# The script's commands are quoted above each step to make parity easy to check.
+
+# for service in /etc/systemd/system/k3s*.service; do systemctl stop ...; done
+# for service in /etc/init.d/k3s*; do $service stop; done
+- name: Stop k3s services
+  ansible.builtin.service:
+    name: "{{ item.path | basename }}"
+    state: stopped
+  loop: "{{ k3s_reset_services_found.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+# killtree $(getshims): kill each containerd shim and every process below it.
+# procps ps needs -e to list all processes; busybox ps (Alpine) lists them all
+# and rejects -e, so fall back to it.
+- name: List processes
+  ansible.builtin.command: ps -e -o pid=,ppid=,args=
+  register: k3s_reset_ps
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: List processes (busybox)
+  when: k3s_reset_ps.rc != 0
+  ansible.builtin.command: ps -o pid,ppid,args
+  register: k3s_reset_ps_busybox
+  changed_when: false
+  check_mode: false
+
+- name: Find containerd shims and their descendants
+  vars:
+    k3s_reset_ps_lines: >-
+      {{ (k3s_reset_ps.stdout_lines if k3s_reset_ps.rc == 0 else k3s_reset_ps_busybox.stdout_lines[1:])
+         | map('trim') | select | list }}
+  ansible.builtin.set_fact:
+    k3s_reset_kill_pids: >-
+      {%- set procs = [] -%}
+      {%- for line in k3s_reset_ps_lines -%}
+      {%-   set f = line.split(None, 2) -%}
+      {%-   if f | length == 3 -%}{%- set _ = procs.append(f) -%}{%- endif -%}
+      {%- endfor -%}
+      {%- macro tree(pid) -%}
+      {{ pid }} {% for p in procs if p[1] == pid %}{{ tree(p[0]) }}{% endfor %}
+      {%- endmacro -%}
+      {%- set out = [] -%}
+      {%- for p in procs if p[2] is search(k3s_reset_data_dir ~ '/data/[^/]*/bin/containerd-shim') -%}
+      {%-   set _ = out.append(tree(p[0])) -%}
+      {%- endfor -%}
+      {{ out | join(' ') }}
+
+- name: Kill containerd shims and their descendants
+  when: k3s_reset_kill_pids | split | length > 0
+  ansible.builtin.command:
+    argv: "{{ ['kill', '-9'] + (k3s_reset_kill_pids | split | unique | list) }}"
+  register: k3s_reset_kill
+  changed_when: true
+  failed_when: false  # a process may exit between listing and killing
+
+# do_unmount_and_remove '/run/k3s' (and the other prefixes)
+- name: Unmount k3s filesystems and remove their mount points
+  ansible.builtin.include_tasks: unmount.yml
+
+# ip netns show | grep cni- | xargs -r -t -n 1 ip netns delete
+- name: List network namespaces
+  ansible.builtin.command: ip -j netns list
+  register: k3s_reset_netns
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Remove CNI network namespaces
+  community.general.ip_netns:
+    name: "{{ item }}"
+    state: absent
+  loop: >-
+    {{ ((k3s_reset_netns.stdout | default('', true) | trim) or '[]') | from_json
+       | map(attribute='name') | select('match', 'cni-') | list }}
+
+# remove_interfaces: interfaces whose master is cni0, then the named CNI interfaces
+- name: List interfaces attached to cni0
+  ansible.builtin.command: ip -j link show master cni0
+  register: k3s_reset_cni_links
+  changed_when: false
+  failed_when: false  # exits non-zero when cni0 does not exist
+  check_mode: false
+
+- name: Remove CNI interfaces
+  ansible.builtin.command:
+    argv: [ip, link, delete, "{{ item }}"]
+  loop: >-
+    {{ ((k3s_reset_cni_links.stdout | default('', true) | trim) or '[]') | from_json
+       | map(attribute='ifname') | list
+       + (k3s_reset_cni_interfaces | intersect(ansible_facts['interfaces'] | default([]))) }}
+  register: k3s_reset_link_delete
+  changed_when: k3s_reset_link_delete.rc == 0
+  failed_when: false  # deleting cni0 also removes the interfaces attached to it
+
+# if [ -n "$(command -v tailscale)" ]; then tailscale set --advertise-routes=; fi
+- name: Clear routes advertised to tailscale
+  ansible.builtin.command:
+    argv: [tailscale, set, --advertise-routes=]
+  register: k3s_reset_tailscale
+  changed_when: k3s_reset_tailscale.rc == 0
+  failed_when: false  # tailscale is not installed
+
+# rm -rf /var/lib/cni/
+- name: Remove CNI state
+  ansible.builtin.file:
+    path: /var/lib/cni
+    state: absent
+
+# iptables-save | grep -v KUBE- | grep -v CNI- | grep -iv flannel | iptables-restore
+# (and the same for ip6tables). There is no module that filters a whole ruleset.
+- name: Save firewall rules
+  ansible.builtin.command: "{{ item }}-save"
+  loop: [iptables, ip6tables]
+  register: k3s_reset_rules
+  changed_when: false
+  failed_when: false  # the tool is not installed
+  check_mode: false
+
+- name: Restore firewall rules without k3s entries
+  vars:
+    k3s_reset_newline: "\n"
+    k3s_reset_filtered: >-
+      {{ item.stdout_lines | reject('search', 'KUBE-|CNI-') | reject('search', 'flannel', ignorecase=true)
+         | join(k3s_reset_newline) ~ k3s_reset_newline }}
+  ansible.builtin.command:
+    argv: ["{{ item.item }}-restore"]
+    stdin: "{{ k3s_reset_filtered }}"
+    stdin_add_newline: false
+  when:
+    - item.rc == 0
+    - (item.stdout_lines | select('search', 'KUBE-|CNI-') | list | length > 0)
+      or (item.stdout_lines | select('search', 'flannel', ignorecase=true) | list | length > 0)
+  loop: "{{ k3s_reset_rules.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  changed_when: true

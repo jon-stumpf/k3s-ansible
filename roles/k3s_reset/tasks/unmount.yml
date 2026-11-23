@@ -1,0 +1,31 @@
+---
+# do_unmount_and_remove <prefix>, for each of k3s_reset_unmount_prefixes:
+# unmount every mount under the prefix, deepest first, then remove the mount point.
+
+- name: Read mounted filesystems
+  ansible.builtin.slurp:
+    src: /proc/self/mounts
+  register: k3s_reset_mounts_raw
+
+- name: Select k3s mount points
+  vars:
+    k3s_reset_mount_paths: >-
+      {{ (k3s_reset_mounts_raw.content | b64decode).splitlines()
+         | map('split') | map(attribute=1) | list }}
+  ansible.builtin.set_fact:
+    k3s_reset_mount_points: >-
+      {{ k3s_reset_mount_paths
+         | select('match', '(' ~ (k3s_reset_unmount_prefixes | map('regex_escape') | join('|')) ~ ')')
+         | unique | sort | reverse | list }}
+
+- name: Unmount k3s filesystems
+  ansible.posix.mount:
+    path: "{{ item }}"
+    state: unmounted
+  loop: "{{ k3s_reset_mount_points }}"
+
+- name: Remove k3s mount points
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ k3s_reset_mount_points }}"

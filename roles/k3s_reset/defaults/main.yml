@@ -1,0 +1,6 @@
+---
+systemd_dir: /etc/systemd/system  # noqa var-naming[no-role-prefix]
+k3s_server_location: /var/lib/rancher/k3s  # noqa var-naming[no-role-prefix]
+# Remove the k3s-selinux package and the rancher-k3s-common repo files,
+# as k3s-uninstall.sh does.
+k3s_reset_remove_packages: true
