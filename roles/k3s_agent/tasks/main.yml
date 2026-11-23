@@ -81,6 +81,52 @@
     line: "{{ item }}"
   loop: "{{ extra_service_envs }}"
 
+# Optional systemd memory limits for the k3s-agent service. They go in a drop-in
+# because the install script regenerates the unit file. Unsetting all three
+# variables removes the drop-in.
+- name: Set k3s-agent service memory limits
+  when: ansible_facts['service_mgr'] == 'systemd'
+  vars:
+    k3s_agent_memory_limits:
+      MemoryHigh: "{{ service_memory_high | default('') }}"
+      MemoryMax: "{{ service_memory_max | default('') }}"
+      MemorySwapMax: "{{ service_memory_swapmax | default('') }}"
+    k3s_agent_memory_set: "{{ k3s_agent_memory_limits.values() | select | list | length > 0 }}"
+  block:
+    - name: Create k3s-agent service drop-in directory
+      when: k3s_agent_memory_set
+      ansible.builtin.file:
+        path: "{{ systemd_dir }}/k3s-agent.service.d"
+        state: directory
+        mode: "0755"
+
+    - name: Write k3s-agent service memory limits
+      when: k3s_agent_memory_set
+      ansible.builtin.copy:
+        content: |
+          # Managed by k3s-ansible
+          [Service]
+          {% for key, value in k3s_agent_memory_limits.items() if value %}
+          {{ key }}={{ value }}
+          {% endfor %}
+        dest: "{{ systemd_dir }}/k3s-agent.service.d/memory.conf"
+        mode: "0644"
+      register: k3s_agent_memory_dropin
+
+    - name: Remove k3s-agent service memory limits
+      when: not k3s_agent_memory_set
+      ansible.builtin.file:
+        path: "{{ systemd_dir }}/k3s-agent.service.d/memory.conf"
+        state: absent
+      register: k3s_agent_memory_dropin_removed
+
+    - name: Reload systemd for k3s-agent service memory limits
+      when:
+        - not ansible_check_mode
+        - (k3s_agent_memory_dropin is changed) or (k3s_agent_memory_dropin_removed is changed)
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+
 - name: Delete any existing token from the environment if different from the new one
   ansible.builtin.lineinfile:
     state: absent

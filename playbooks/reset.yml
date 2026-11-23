@@ -31,6 +31,11 @@
       ansible.builtin.file:
         path: /etc/rancher/k3s/config.yaml
         state: absent
+    - name: Remove K3s service memory limits
+      ansible.builtin.file:
+        path: "{{ systemd_dir | default('/etc/systemd/system') }}/{{ item }}.service.d/memory.conf"
+        state: absent
+      loop: [k3s, k3s-agent]
 
 - name: Undo user setup
   hosts: server
